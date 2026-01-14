@@ -1,5 +1,4 @@
 // app/layout.tsx
-import { useEffect } from "react";
 import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
@@ -30,19 +29,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Optional JS fix for dynamic vh in older mobile browsers
-  useEffect(() => {
-    const setVh = () => {
-      document.documentElement.style.setProperty(
-        "--vh",
-        `${window.innerHeight * 0.01}px`
-      );
-    };
-    setVh();
-    window.addEventListener("resize", setVh);
-    return () => window.removeEventListener("resize", setVh);
-  }, []);
-
   return (
     <html lang="en">
       <body
@@ -52,24 +38,19 @@ export default function RootLayout({
           antialiased
           flex
           flex-col
-          min-h-[100dvh]
+          min-h-screen
+          sm:min-h-[100dvh] 
           overflow-x-hidden
         `}
       >
         <FeedbackProvider>
           <main className="flex-1 w-full flex flex-col relative">
-            {/* Content wrapper */}
             <div className="w-full flex-1">{children}</div>
-
-            {/* Feedback modal stays inside main */}
             <FeedbackModal />
           </main>
         </FeedbackProvider>
 
-        {/* Footer at the bottom */}
         <Footer />
-
-        {/* Global toaster notifications */}
         <Toaster position="top-center" richColors />
       </body>
     </html>
