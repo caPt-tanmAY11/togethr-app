@@ -1,0 +1,356 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                     String           @id @default(cuid())
+  name                   String
+  slug                   String?          @unique
+  phone                  String?          @unique
+  email                  String           @unique
+  emailVerified          Boolean          @default(false)
+  trustPoints            Int              @default(0)
+  image                  String?
+  headline               String?
+  locationCity           String?
+  about                  String?
+  linkedinUrl            String?
+  githubUrl              String?
+  portfolioUrl           String?
+  XUrl                   String?
+  locationCountry        String?
+  organization           String?
+  skills                 String[]
+  onboardingStatus       OnboardingStatus @default(NOT_STARTED)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  sessions               Session[]
+  accounts               Account[]
+  HackTeam               HackTeam[]
+  HackTeamMember         HackTeamMember[]
+  RequestSender          Request[]        @relation("SentRequests")
+  RequestReceiver        Request[]        @relation("ReceivedRequests")
+  projects               Project[]
+  projectMembers         ProjectMember[]
+  projectRequestsSent    ProjectRequest[] @relation("SentRequests")
+  projectRequestReceived ProjectRequest[] @relation("ReceivedRequests")
+  education              Education[]
+  achievements           Achievement[]
+  following              Follow[]         @relation("Following")
+  followers              Follow[]         @relation("Followers")
+  feedbacks              Feedback[]
+
+  @@map("user")
+}
+
+enum OnboardingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Education {
+  id           String  @id @default(cuid())
+  userId       String
+  institution  String
+  degree       String?
+  fieldOfStudy String?
+  startYear    String?
+  endYear      String?
+  grade        String?
+  description  String?
+  user         User    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Achievement {
+  id          String               @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  issuer      String? // Hackathon, Company, Platform
+  category    AchievementCategory?
+  proofUrl    String? // certificate, post, GitHub, drive link
+  user        User                 @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+enum AchievementCategory {
+  HACKATHON
+  CERTIFICATION
+  AWARD
+  COMPETITION
+  OPEN_SOURCE
+  ACADEMIC
+  OTHER
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Following", fields: [followerId], references: [id])
+  following   User     @relation("Followers", fields: [followingId], references: [id])
+
+  @@id([followerId, followingId])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model HackTeam {
+  teamId          String           @id @default(cuid())
+  name            String
+  origin          String
+  teamDesc        String?
+  image           String?
+  size            Int
+  spotsLeft       Int
+  teamStatus      TeamStatus       @default(OPEN)
+  skillStack      String[]
+  hackName        String
+  hackDesc        String?
+  hackBegins      DateTime
+  hackEnds        DateTime
+  hackLink        String?
+  hackLocation    String
+  hackMode        HackMode
+  teamLeadPhoneNo String
+  teamLeadEmail   String
+  createdAt       DateTime         @default(now())
+  createdByName   String
+  createdById     String
+  createdBy       User             @relation(fields: [createdById], references: [id])
+  members         HackTeamMember[]
+  Request         Request[]
+}
+
+enum TeamStatus {
+  OPEN
+  CANCELLED
+  COMPLETED
+}
+
+enum HackMode {
+  VIRTUAL
+  INPERSON
+  HYBRID
+}
+
+model HackTeamMember {
+  userId String
+  teamId String
+  role   Role
+  name   String
+  user   User     @relation(fields: [userId], references: [id])
+  team   HackTeam @relation(fields: [teamId], references: [teamId])
+
+  @@id([userId, teamId])
+}
+
+enum Role {
+  TEAM_LEAD
+  MEMBER
+}
+
+model Request {
+  id          String        @id @default(cuid())
+  type        RequestType
+  status      RequestStatus @default(PENDING)
+  senderId    String
+  receiverId  String
+  hackTeamId  String?
+  message     String
+  githubURL   String
+  linkedinURL String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  sender      User          @relation("SentRequests", fields: [senderId], references: [id])
+  receiver    User          @relation("ReceivedRequests", fields: [receiverId], references: [id])
+  hackTeam    HackTeam?     @relation(fields: [hackTeamId], references: [teamId])
+}
+
+enum RequestType {
+  JOIN
+  INVITE
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model Project {
+  id               String           @id @default(cuid())
+  title            String
+  shortDesc        String
+  detailedDesc     String
+  projectStatus    ProjectStatus    @default(OPEN)
+  extraNote        String?
+  stage            ProjectStage
+  isOpen           Boolean          @default(true)
+  skillStack       String[]
+  tags             String[]
+  commitment       CommitmentLevel
+  currentMembers   Int              @default(1)
+  githubURL        String?
+  contactPhone     String?
+  ownerLinkedInURL String
+  contactEmail     String
+  ownerId          String
+  owner            User             @relation(fields: [ownerId], references: [id])
+  members          ProjectMember[]
+  requests         ProjectRequest[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("project")
+}
+
+enum ProjectStatus {
+  OPEN
+  CANCELLED
+  COMPLETED
+}
+
+enum CommitmentLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ProjectStage {
+  IDEA
+  BUILDING
+  MVP
+  LIVE
+}
+
+model ProjectMember {
+  userId    String
+  projectId String
+  name      String
+  role      ProjectRole
+  joinedAt  DateTime    @default(now())
+  user      User        @relation(fields: [userId], references: [id])
+  project   Project     @relation(fields: [projectId], references: [id])
+
+  @@id([userId, projectId])
+}
+
+enum ProjectRole {
+  OWNER
+  CONTRIBUTOR
+}
+
+model ProjectRequest {
+  id          String               @id @default(cuid())
+  message     String
+  type        ProjectRequestType
+  status      ProjectRequestStatus @default(PENDING)
+  senderId    String
+  receiverId  String
+  projectId   String
+  githubUrl   String
+  linkedinUrl String
+  sender      User                 @relation("SentRequests", fields: [senderId], references: [id])
+  receiver    User                 @relation("ReceivedRequests", fields: [receiverId], references: [id])
+  project     Project              @relation(fields: [projectId], references: [id])
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+enum ProjectRequestType {
+  JOIN
+  INVITE
+}
+
+enum ProjectRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String?
+  email     String?
+  message   String
+  rating    Int? // 1–5 stars
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
