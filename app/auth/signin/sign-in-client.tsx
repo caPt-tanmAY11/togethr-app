@@ -20,12 +20,12 @@ export default function SigninClient() {
   }, [searchParams]);
 
   return (
-    <div className="relative flex justify-center items-center min-h-screen px-4 overflow-hidden">
+    <div className="relative flex justify-center items-center min-h-dvh px-4 overflow-hidden">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative z-10 backdrop-blur-2xl bg-linear-to-br from-white/10 via-white/5 to-transparent border border-white/10 rounded-2xl p-8 sm:p-10 w-full max-w-md sm:max-w-lg text-white"
+        className="relative z-10 backdrop-blur-2xl bg-linear-to-br from-white/10 via-white/5 to-transparent border border-white/10 rounded-2xl p-8 sm:p-10 w-full max-w-md sm:max-w-lg text-white my-auto"
       >
         <div className="text-center mb-10">
           <h1 className="text-2xl sm:text-3xl font-poppins font-semibold tracking-wide">
