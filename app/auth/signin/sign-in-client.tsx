@@ -20,7 +20,7 @@ export default function SigninClient() {
   }, [searchParams]);
 
   return (
-    <div className="relative flex justify-center items-center min-h-dvh px-4 overflow-hidden">
+    <div className="relative flex-1 flex justify-center items-center px-4 py-8">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
