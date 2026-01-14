@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ProjectBrief {
   id: string;
@@ -83,131 +84,128 @@ export default function Projects() {
     return () => controller.abort();
   }, []);
 
-  const FilterModal = (
-    <AnimatePresence>
-      {showFilter && (
-        <>
-          {/* BACKDROP */}
-          <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowFilter(false)}
-          />
+  const FilterModal =
+    typeof window !== "undefined"
+      ? createPortal(
+          <AnimatePresence>
+            {showFilter && (
+              <>
+                <motion.div
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-998"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowFilter(false)}
+                />
 
-          {/* MODAL */}
-          <motion.form
-            onSubmit={handleApplyFilters}
-            className="fixed top-1/2 left-1/2 z-50 w-[90%] max-w-md
+                <motion.form
+                  onSubmit={handleApplyFilters}
+                  className="fixed top-1/2 left-1/2 z-998 w-[90%] max-w-md
               -translate-x-1/2 -translate-y-1/2 rounded-2xl
-              bg-[#0c0a0a70] border border-white/10 p-6 text-white"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">Filter Projects</h2>
+              bg-[#0c0a0a] border border-white/10 p-6 text-white"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-semibold">Filter Projects</h2>
 
-              <button
-                type="button"
-                onClick={() => setShowFilter(false)}
-                className="
+                    <button
+                      type="button"
+                      onClick={() => setShowFilter(false)}
+                      className="
                 text-white/60 hover:text-white
                 transition
                 text-lg leading-none cursor-pointer
               "
-                aria-label="Close filter modal"
-              >
-                ✕
-              </button>
-            </div>
+                      aria-label="Close filter modal"
+                    >
+                      ✕
+                    </button>
+                  </div>
 
-            <div className="flex flex-col gap-5">
-              {/* -------- Scope -------- */}
-              {session && (
-                <div>
-                  <label className="text-sm text-white/60 mb-2 block">
-                    Project Scope
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        "ALL",
-                        "MY_PROJECT",
-                        "CONTRIBUTING_IN",
-                        "REQUESTED",
-                      ] as ProjectScope[]
-                    ).map((scope) => (
-                      <button
-                        key={scope}
-                        type="button"
-                        onClick={() => setScopeFilter(scope)}
-                        className={`rounded-lg px-3 py-2 text-sm border transition cursor-pointer
+                  <div className="flex flex-col gap-5">
+                    {session && (
+                      <div>
+                        <label className="text-sm text-white/60 mb-2 block">
+                          Project Scope
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {(
+                            [
+                              "ALL",
+                              "MY_PROJECT",
+                              "CONTRIBUTING_IN",
+                              "REQUESTED",
+                            ] as ProjectScope[]
+                          ).map((scope) => (
+                            <button
+                              key={scope}
+                              type="button"
+                              onClick={() => setScopeFilter(scope)}
+                              className={`rounded-lg px-3 py-2 text-sm border transition cursor-pointer
                             ${
                               scopeFilter === scope
                                 ? "bg-[#882d2d5d] border-[#be3939c5] text-[#be3939c5]"
                                 : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
                             }`}
-                      >
-                        {scope.replace("_", " ")}
-                      </button>
-                    ))}
+                            >
+                              {scope.replace("_", " ")}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <CustomDropdown
+                      label=""
+                      options={["ANY", "IDEA", "BUILDING", "MVP", "LIVE"]}
+                      placeholder="Select project stage"
+                      selected={projectStageFilter}
+                      setSelected={setProjectStageFilter}
+                      type="projects"
+                    />
+
+                    <CustomDropdown
+                      label=""
+                      options={["ANY", "LOW", "MEDIUM", "HIGH"]}
+                      placeholder="Select commitment level"
+                      selected={projectCommitmentFilter}
+                      setSelected={setProjectCommitmentFilter}
+                      type="projects"
+                    />
+
+                    <SkillStackSection
+                      elements={skills}
+                      setElements={setSkills}
+                      type="skillstack"
+                      section="projects"
+                    />
+
                   </div>
-                </div>
-              )}
 
-              <CustomDropdown
-                label=""
-                options={["ANY", "IDEA", "BUILDING", "MVP", "LIVE"]}
-                placeholder="Select project stage"
-                selected={projectStageFilter}
-                setSelected={setProjectStageFilter}
-                type="projects"
-              />
-
-              {/* Hack Mode */}
-              <CustomDropdown
-                label=""
-                options={["ANY", "LOW", "MEDIUM", "HIGH"]}
-                placeholder="Select commitment level"
-                selected={projectCommitmentFilter}
-                setSelected={setProjectCommitmentFilter}
-                type="projects"
-              />
-
-              {/* Skills */}
-              <SkillStackSection
-                elements={skills}
-                setElements={setSkills}
-                type="skillstack"
-                section="projects"
-              />
-
-              {/* !TODO: filter for project tags...  */}
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex gap-3 mt-8">
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="flex-1 bg-white/10 hover:bg-white/20 py-2 rounded-lg cursor-pointer"
-              >
-                Reset
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-[#f36262b7] hover:bg-[#fc8e8eb7] py-2 rounded-lg cursor-pointer"
-              >
-                Apply
-              </button>
-            </div>
-          </motion.form>
-        </>
-      )}
-    </AnimatePresence>
-  );
+                  <div className="flex gap-3 mt-8">
+                    <button
+                      type="button"
+                      onClick={handleResetFilters}
+                      className="flex-1 bg-white/10 hover:bg-white/20 py-2 rounded-lg cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 bg-[#f36262b7] hover:bg-[#fc8e8eb7] py-2 rounded-lg cursor-pointer"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </motion.form>
+              </>
+            )}
+          </AnimatePresence>,
+          document.body
+        )
+      : null;
 
   async function handleApplyFilters(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -269,13 +267,11 @@ export default function Projects() {
   if (loading) {
     return (
       <>
-        {/* HEADER SKELETON */}
         <div className="flex items-center justify-between mt-15 sm:mt-20 max-w-7xl mx-auto animate-pulse">
           <div className="h-7 w-40 bg-white/10 rounded" />
           <div className="h-9 w-24 bg-white/10 rounded-lg" />
         </div>
 
-        {/* GRID SKELETON */}
         <div
           className="
           grid
@@ -310,10 +306,11 @@ export default function Projects() {
   if (!loading && projects.length === 0) {
     return (
       <>
-        {/* HEADER */}
         <div className="flex items-center justify-between mt-15 sm:mt-20 font-inter max-w-7xl mx-auto">
           <div className="relative inline-block">
-            <h1 className="text-lg sm:text-2xl font-extrabold text-white">Projects</h1>
+            <h1 className="text-lg sm:text-2xl font-extrabold text-white">
+              Projects
+            </h1>
 
             <span
               className="absolute left-0 -bottom-1 w-full h-0.75 rounded-full
@@ -331,7 +328,6 @@ export default function Projects() {
           </button>
         </div>
 
-        {/* EMPTY STATE */}
         <div className="my-24 flex flex-col items-center justify-center text-center text-white/80 px-4">
           <div
             className="
@@ -383,9 +379,10 @@ export default function Projects() {
     <>
       <div className="flex items-center justify-between mt-15 sm:mt-20 max-w-7xl mx-auto">
         <div className="relative inline-block">
-          <h1 className="text-lg sm:text-2xl font-semibold text-white">Projects</h1>
+          <h1 className="text-lg sm:text-2xl font-semibold text-white">
+            Projects
+          </h1>
 
-          {/* Underline */}
           <span
             className="absolute left-0 -bottom-1 w-full h-0.75 rounded-full
       bg-linear-to-r from-[#f36262] via-[#fc8e8e] to-[#f36262]
@@ -393,7 +390,6 @@ export default function Projects() {
           />
         </div>
 
-        {/* FILTER BUTTON */}
         <button
           onClick={() => setShowFilter(true)}
           className="bg-[#f36262b7] hover:bg-[#fc8e8eb7]

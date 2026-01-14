@@ -14,9 +14,9 @@ export async function PATCH(req: Request) {
 
     const { skills, achievements } = await req.json();
 
-    if (!Array.isArray(skills)) {
+    if (!Array.isArray(skills) || skills.length === 0) {
         return NextResponse.json(
-            { error: "Skills must be an array" },
+            { error: "At least one skill is required" },
             { status: 400 }
         );
     }
@@ -28,16 +28,6 @@ export async function PATCH(req: Request) {
         );
     }
 
-    /* ---------- VALIDATE ACHIEVEMENTS ---------- */
-    const missingTitle = achievements.find((a) => !a.title?.trim());
-    if (missingTitle) {
-        return NextResponse.json(
-            { error: "Achievement title is required", field: "title" },
-            { status: 400 }
-        );
-    }
-
-    /* -------------------- UPDATE SKILLS -------------------- */
     await prisma.user.update({
         where: { id: session.user.id },
         data: {
@@ -46,22 +36,19 @@ export async function PATCH(req: Request) {
         },
     });
 
-    /* -------------------- REPLACE ACHIEVEMENTS -------------------- */
     if (achievements.length > 0) {
-        // Delete existing achievements first
         await prisma.achievement.deleteMany({
             where: { userId: session.user.id },
         });
 
-        // Insert new achievements
         await prisma.achievement.createMany({
             data: achievements.map((a) => ({
                 userId: session.user.id,
-                title: a.title,
-                description: a.description,
-                issuer: a.issuer,
-                category: a.category,
-                proofUrl: a.proofUrl,
+                title: a.title ?? null,
+                description: a.description ?? null,
+                issuer: a.issuer ?? null,
+                category: a.category ?? null,
+                proofUrl: a.proofUrl ?? null,
             })),
         });
     }

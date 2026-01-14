@@ -170,13 +170,6 @@ export async function GET(req: NextRequest) {
             ? (projectStageParam as ProjectStage)
             : undefined;
 
-        console.log({
-            scope,
-            projectCommitment,
-            projectStage,
-            skills
-        });
-
         const whereClause: Prisma.ProjectWhereInput = {
             ...(projectCommitment && { commitment: projectCommitment }),
             ...(projectStage && { stage: projectStage }),

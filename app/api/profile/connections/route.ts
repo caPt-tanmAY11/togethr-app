@@ -35,7 +35,6 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        // 🔥 Find profile owner
         const profileUser = await prisma.user.findUnique({
             where: { slug },
             select: { id: true },
@@ -50,7 +49,6 @@ export async function GET(req: NextRequest) {
 
         const profileUserId = profileUser.id;
 
-        // 👥 FETCH FOLLOWERS
         if (type === "FOLLOWERS") {
             const followers = await prisma.follow.findMany({
                 where: {
@@ -74,7 +72,6 @@ export async function GET(req: NextRequest) {
             });
         }
 
-        // 👥 FETCH FOLLOWING
         if (type === "FOLLOWING") {
             const following = await prisma.follow.findMany({
                 where: {

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import OnboardingStep1Skeleton from "@/components/skeletons/onboarding-step1";
 
 export default function OnboardingStep1() {
   const router = useRouter();
@@ -18,7 +19,6 @@ export default function OnboardingStep1() {
   const [loading, setLoading] = useState(false);
   const [hydrating, setHydrating] = useState(true);
 
-  /* -------------------- LOAD SAVED DATA -------------------- */
   useEffect(() => {
     async function loadData() {
       try {
@@ -35,7 +35,6 @@ export default function OnboardingStep1() {
           locationCountry: data.locationCountry ?? "",
         });
       } catch {
-        // Silent fail — onboarding should still work
       } finally {
         setHydrating(false);
       }
@@ -44,7 +43,6 @@ export default function OnboardingStep1() {
     loadData();
   }, []);
 
-  /* -------------------- HANDLERS -------------------- */
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
@@ -70,17 +68,14 @@ export default function OnboardingStep1() {
 
       const data = await res.json();
 
-      /* ---------- Auth ---------- */
       if (res.status === 401) {
         toast.error("Session expired. Please log in again.");
         router.push("/login");
         return;
       }
 
-      /* ---------- Validation ---------- */
       if (res.status === 400) {
         if (Array.isArray(data.fields)) {
-          // Priority order (first missing field wins)
           const fieldPriority = [
             "headline",
             "about",
@@ -114,13 +109,11 @@ export default function OnboardingStep1() {
         return;
       }
 
-      /* ---------- Other errors ---------- */
       if (!res.ok) {
         toast.error(data?.error || "Something went wrong");
         return;
       }
 
-      /* ---------- Success ---------- */
       toast.success("Step 1 completed");
       router.push("/onboarding/step-2");
     } catch {
@@ -130,16 +123,10 @@ export default function OnboardingStep1() {
     }
   }
 
-  /* -------------------- LOADING STATE -------------------- */
   if (hydrating) {
-    return (
-      <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 p-10 text-white/60">
-        Loading your details...
-      </div>
-    );
+    return <OnboardingStep1Skeleton />;
   }
 
-  /* -------------------- UI -------------------- */
   return (
     <motion.div
       initial={{ y: 24, opacity: 0 }}
@@ -147,7 +134,8 @@ export default function OnboardingStep1() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="
       my-auto
-      w-[92vw]
+      w-[95vw]
+      font-inter
       max-w-md
       sm:max-w-lg
       lg:max-w-xl
@@ -163,7 +151,6 @@ export default function OnboardingStep1() {
       overflow-y-auto
     "
     >
-      {/* STEP INDICATOR */}
       <div className="mb-5 sm:mb-6">
         <div className="flex items-center justify-between text-xs sm:text-sm">
           <span className="tracking-widest text-white/60">STEP 1 OF 4</span>
@@ -175,7 +162,6 @@ export default function OnboardingStep1() {
         </div>
       </div>
 
-      {/* HEADER */}
       <div className="mb-5 sm:mb-6">
         <h1 className="text-lg sm:text-2xl font-semibold">Let’s get started</h1>
         <p className="text-xs sm:text-base text-white/60 mt-1">
@@ -184,7 +170,6 @@ export default function OnboardingStep1() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-        {/* Headline */}
         <div>
           <label className="block mb-1 text-sm text-white/60">Headline *</label>
           <input
@@ -194,17 +179,16 @@ export default function OnboardingStep1() {
             placeholder="Full Stack Developer | Hackathon Enthusiast"
             className="
             w-full bg-white/10
-            px-3 py-2
+            px-2 sm:px-3 py-1.5
             sm:py-2.5
             border border-white/10
-            rounded-md outline-none
+            rounded-md outline-none text-xs sm:text-sm
             text-white
             focus:ring-1 focus:ring-teal-600
           "
           />
         </div>
 
-        {/* About */}
         <div>
           <label className="block mb-1 text-sm text-white/60">About *</label>
           <textarea
@@ -216,15 +200,14 @@ export default function OnboardingStep1() {
             className="
             w-full rounded-lg bg-white/5
             border border-white/10
-            px-3 py-2
+            px-2 py-2
             sm:px-4 sm:py-2.5
-            outline-none resize-none
+            outline-none resize-none text-xs sm:text-sm
             focus:ring-1 focus:ring-teal-600
           "
           />
         </div>
 
-        {/* Location */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 text-sm text-white/60">City *</label>
@@ -235,10 +218,10 @@ export default function OnboardingStep1() {
               placeholder="Mumbai"
               className="
             w-full bg-white/10
-            px-3 py-2
+            px-2 sm:px-3 py-1.5
             sm:py-2.5
             border border-white/10
-            rounded-md outline-none
+            rounded-md outline-none text-xs sm:text-sm
             focus:ring-1 focus:ring-teal-600
           "
             />
@@ -255,9 +238,9 @@ export default function OnboardingStep1() {
               placeholder="India"
               className="
             w-full bg-white/10
-            px-3 py-2
+           px-2 sm:px-3 py-1.5
             sm:py-2.5
-            border border-white/10
+            border border-white/10 text-xs sm:text-sm
             rounded-md outline-none
             focus:ring-1 focus:ring-teal-600
           "
@@ -265,7 +248,6 @@ export default function OnboardingStep1() {
           </div>
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
@@ -273,7 +255,7 @@ export default function OnboardingStep1() {
           w-full
           auth-form-main-btn
           rounded-lg
-          py-1.5 sm:py-3
+          py-2 sm:py-3 mt-2
           text-xs sm:text-sm
           font-medium
           disabled:opacity-60

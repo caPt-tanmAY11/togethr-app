@@ -16,8 +16,6 @@ export async function POST(
             headers: await headers()
         })
 
-        console.log(session);
-
         if (!session?.user?.id) {
             return NextResponse.json(
                 { error: "Unauthorized" },

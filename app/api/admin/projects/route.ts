@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-// import { requireAdmin } from "@/lib/admin-auth"; // optional
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function GET(request: Request) {
     try {
-        // 🔐 OPTIONAL: Admin auth
-        // await requireAdmin();
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
+
+        if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
 
         const { searchParams } = new URL(request.url);
 
@@ -13,11 +22,10 @@ export async function GET(request: Request) {
         const limit = parseInt(searchParams.get("limit") || "20");
         const skip = (page - 1) * limit;
 
-        // Optional filters
         const search = searchParams.get("search") || "";
-        const status = searchParams.get("status"); // OPEN | COMPLETED | CANCELLED
-        const stage = searchParams.get("stage"); // IDEA | BUILDING | MVP | LIVE
-        const isOpen = searchParams.get("isOpen"); // true | false
+        const status = searchParams.get("status");
+        const stage = searchParams.get("stage");
+        const isOpen = searchParams.get("isOpen"); 
 
         const where: any = {
             OR: [

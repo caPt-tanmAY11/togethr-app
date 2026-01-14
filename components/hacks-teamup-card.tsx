@@ -33,9 +33,7 @@ export default function HacksTeamupCard({
 
   return (
     <>
-      {/* Content */}
       <div className="flex flex-col gap-5 p-6 pb-16">
-        {/* Header section */}
         <div className="flex items-center gap-4">
           <div className="h-20 w-20 rounded-lg border border-white/10 overflow-hidden bg-white/5">
             {image ? (
@@ -65,7 +63,6 @@ export default function HacksTeamupCard({
           </div>
         </div>
 
-        {/* Hackathon details */}
         <div className="bg-white/5 flex flex-col gap-2 font-inter py-4 px-4 rounded-lg border border-white/10 shadow-inner">
           <div>
             <h2 className="font-semibold text-base">{hackName}</h2>
@@ -83,7 +80,6 @@ export default function HacksTeamupCard({
           </p>
         </div>
 
-        {/* Team info */}
         <div className="font-inter text-sm px-1">
           <p className="font-medium">
             Team Size:{" "}
@@ -108,7 +104,6 @@ export default function HacksTeamupCard({
         </div>
       </div>
 
-      {/* Fixed bottom-right button */}
       <div className="absolute bottom-5 right-5 font-inter">
         <Link
           href={`/main/hacks-teamup/${teamId}`}

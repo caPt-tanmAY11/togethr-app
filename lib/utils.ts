@@ -5,8 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// lib/utils.ts
-
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 }
@@ -24,8 +22,6 @@ export function slugify(text: string): string {
     .replace(/^-+/, '')              // Trim - from start
     .replace(/-+$/, '');             // Trim - from end
 }
-
-// lib/utils.ts
 
 export function getInitials(name: string): string {
   if (!name) return "U";
@@ -49,7 +45,6 @@ export function getRandomColor(name: string): string {
     "bg-cyan-500",
   ];
 
-  // A simple hash to ensure the same name always gets the same color
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -72,7 +67,6 @@ export function formatHackathonDates(start: string, end: string) {
     year: "numeric",
   });
 
-  // same month & year
   if (
     startDate.getMonth() === endDate.getMonth() &&
     startDate.getFullYear() === endDate.getFullYear()
@@ -82,7 +76,6 @@ export function formatHackathonDates(start: string, end: string) {
     )} ${monthYearFormatter.format(startDate)}`;
   }
 
-  // different months or years
   return `${dayFormatter.format(startDate)} ${monthYearFormatter.format(
     startDate
   )} – ${dayFormatter.format(endDate)} ${monthYearFormatter.format(endDate)}`;

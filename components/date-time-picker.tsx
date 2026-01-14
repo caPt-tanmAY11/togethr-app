@@ -46,13 +46,12 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
         <div className="w-full flex flex-col gap-1 relative">
             <label className="px-1 text-white/80 text-sm font-medium">{label}</label>
 
-            {/* Button trigger */}
             <button
                 type="button"
                 onClick={() => setIsOpen(true)}
                 className="w-full text-left bg-white/10 px-3 py-2.5 rounded-md outline-none 
                    focus:ring-1 focus:ring-teal-600 transition-all duration-200 
-                   flex justify-between items-center text-white/80 hover:bg-white/15"
+                   flex justify-between items-center text-white/80 hover:bg-white/15 border border-white/15"
             >
                 {value ? (
                     <>
@@ -63,11 +62,9 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                 )}
             </button>
 
-            {/* Popup modal */}
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        {/* Backdrop */}
                         <motion.div
                             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
                             initial={{ opacity: 0 }}
@@ -76,7 +73,6 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                             onClick={() => setIsOpen(false)}
                         />
 
-                        {/* Modal */}
                         <motion.div
                             className="fixed inset-0 z-50 flex items-center justify-center"
                             initial={{ scale: 0.8, opacity: 0 }}
@@ -85,7 +81,6 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                             transition={{ duration: 0.25 }}
                         >
                             <div className="bg-[#0b0f0f] border border-white/10 rounded-2xl shadow-xl p-6 w-[90%] max-w-[420px] text-white">
-                                {/* Header */}
                                 <div className="flex items-center justify-between mb-4">
                                     <button
                                         onClick={() => setMonthOffset((prev) => prev - 1)}
@@ -104,7 +99,6 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                                     </button>
                                 </div>
 
-                                {/* Calendar grid */}
                                 <div className="grid grid-cols-7 gap-1 text-center text-sm mb-4">
                                     {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
                                         <div key={d} className="text-white/50 font-medium">{d}</div>
@@ -135,7 +129,6 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                                     })}
                                 </div>
 
-                                {/* Time selector (Hours + Minutes toggle) */}
                                 <div className="flex justify-between items-center mb-4 gap-4">
                                     <div className="flex-1">
                                         <label className="text-sm text-white/70 block mb-1">Hours</label>
@@ -145,7 +138,7 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                                             max="23"
                                             value={hours}
                                             onChange={(e) => setHours(Number(e.target.value))}
-                                            className="w-full accent-teal-500"
+                                            className="w-full accent-teal-500 "
                                         />
                                         <div className="text-center text-white/70 text-sm mt-1 font-medium">
                                             {hours.toString().padStart(2, "0")}
@@ -171,7 +164,6 @@ export default function CalendarTimePicker({ label, value, onChange }: CalendarT
                                     </div>
                                 </div>
 
-                                {/* Buttons */}
                                 <div className="flex justify-end gap-3">
                                     <button
                                         onClick={() => setIsOpen(false)}

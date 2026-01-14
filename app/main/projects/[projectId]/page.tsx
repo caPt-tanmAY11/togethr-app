@@ -134,13 +134,11 @@ export default function ProjectDetailsPage() {
       const resData = await res.json();
 
       if (!resData.success) {
-        // Handle API-level errors
         toast.error(resData.error || "Failed to send join request");
         console.error("API Error:", resData.error);
         return;
       }
 
-      // Success
       toast.success(resData.message || "Request sent successfully!");
       router.replace("/main/projects");
 
@@ -170,7 +168,6 @@ export default function ProjectDetailsPage() {
         };
       });
     } catch (error) {
-      // Network or runtime errors
       console.error("Error sending request:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -194,7 +191,6 @@ export default function ProjectDetailsPage() {
       const resData = await res.json();
 
       if (!res.ok || !resData.success) {
-        // Use error from API if available
         const errorMsg = resData.error || "Failed to update request status";
         toast.error(errorMsg);
         console.error("Request update error:", errorMsg);
@@ -207,7 +203,6 @@ export default function ProjectDetailsPage() {
 
       console.log(resData);
 
-      // Update local state to reflect changes
       setProject((prev) => {
         if (!prev) return prev;
 
@@ -326,9 +321,7 @@ export default function ProjectDetailsPage() {
   return (
     <>
       <div className="mx-auto my-30 w-[90%] max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-10 font-inter">
-        {/* LEFT */}
         <div className="flex flex-col gap-8">
-          {/* Project Card */}
           <motion.div
             className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg"
             initial={{ y: -50, opacity: 0 }}
@@ -351,7 +344,6 @@ export default function ProjectDetailsPage() {
             </div>
           </motion.div>
 
-          {/* Project Info */}
           <motion.div
             className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white"
             initial={{ y: 50, opacity: 0 }}
@@ -416,9 +408,7 @@ export default function ProjectDetailsPage() {
           </motion.div>
         </div>
 
-        {/* RIGHT */}
         <div className="flex flex-col gap-8">
-          {/* Details */}
           <motion.div
             className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white"
             initial={{ x: 50, opacity: 0 }}
@@ -468,7 +458,6 @@ export default function ProjectDetailsPage() {
             </div>
           </motion.div>
 
-          {/* Contact */}
           <motion.div
             className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white flex flex-col gap-6"
             initial={{ y: -50, opacity: 0 }}
@@ -481,7 +470,6 @@ export default function ProjectDetailsPage() {
                   You are the project owner
                 </p>
 
-                {/* Pending Requests */}
                 {requests.filter((r) => r.status === "PENDING").length > 0 ? (
                   <>
                     <h3 className="font-medium text-[#f36262] mt-2 mb-1">
@@ -539,7 +527,6 @@ export default function ProjectDetailsPage() {
                               </div>
                             </div>
 
-                            {/* Disable buttons if no spots left */}
                             <div className="flex gap-2 shrink-0">
                               <button
                                 onClick={() =>
@@ -567,7 +554,6 @@ export default function ProjectDetailsPage() {
                   <p className="text-sm text-[#bdbdbd]">No pending requests</p>
                 )}
 
-                {/* Accepted Members */}
                 {requests.filter((r) => r.status === "ACCEPTED").length > 0 && (
                   <>
                     <h3 className="font-medium text-[#f36262] mt-4 mb-1">
@@ -651,7 +637,6 @@ export default function ProjectDetailsPage() {
               </div>
             )}
 
-            {/* Contact Info */}
             <div className="flex flex-col gap-2 text-sm mt-4">
               <h2 className="font-semibold text-lg">Contact</h2>
               {project.contactPhone ? <p>📞 {project.contactPhone}</p> : ""}

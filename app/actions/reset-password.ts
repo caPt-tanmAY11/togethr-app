@@ -1,15 +1,12 @@
 "use server";
 
-import { auth } from "@/lib/auth"; // Your server-side better-auth instance
+import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 export async function resetPasswordAction(token: string, newPassword: string) {
     try {
-        // We use the server-side 'auth' instance directly
         await auth.api.resetPassword({
             body: {
-                // Better Auth server API usually expects the raw token 
-                // but if it fails, we can try prepending here.
                 token: token, 
                 newPassword: newPassword,
             },

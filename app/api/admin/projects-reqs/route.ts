@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-// import { requireAdmin } from "@/lib/admin-auth"; // optional admin auth
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function GET(request: Request) {
     try {
-        // 🔐 OPTIONAL: Admin authentication
-        // await requireAdmin();
-
+        const session = await auth.api.getSession({
+              headers: await headers()
+            });
+        
+            if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+              return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+              );
+            }
         const { searchParams } = new URL(request.url);
 
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "20");
         const skip = (page - 1) * limit;
 
-        // Optional filters
-        const status = searchParams.get("status"); // PENDING | ACCEPTED | REJECTED | CANCELLED
-        const type = searchParams.get("type"); // JOIN | INVITE
-        const projectId = searchParams.get("projectId"); // specific project
+        const status = searchParams.get("status"); 
+        const type = searchParams.get("type");
+        const projectId = searchParams.get("projectId"); 
 
         const where: any = {};
 

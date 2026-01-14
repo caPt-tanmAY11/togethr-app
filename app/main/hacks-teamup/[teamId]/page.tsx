@@ -157,13 +157,11 @@ export default function HackTeamDetailsPage() {
       const resData = await res.json();
 
       if (!resData.success) {
-        // Handle API-level errors
         toast.error(resData.error || "Failed to send join request");
         console.error("API Error:", resData.error);
         return;
       }
 
-      // Success
       toast.success(resData.message || "Request sent successfully!");
       router.replace("/main/hacks-teamup");
 
@@ -195,7 +193,6 @@ export default function HackTeamDetailsPage() {
         };
       });
     } catch (error) {
-      // Network or runtime errors
       console.error("Error sending request:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -219,7 +216,6 @@ export default function HackTeamDetailsPage() {
       const resData = await res.json();
 
       if (!res.ok || !resData.success) {
-        // Use error from API if available
         const errorMsg = resData.error || "Failed to update request status";
         toast.error(errorMsg);
         console.error("Request update error:", errorMsg);
@@ -232,7 +228,6 @@ export default function HackTeamDetailsPage() {
 
       console.log(resData);
 
-      // Update local state to reflect changes
       setTeam((prev) => {
         if (!prev) return prev;
 
@@ -350,9 +345,7 @@ export default function HackTeamDetailsPage() {
   return (
     <>
       <div className="mx-auto my-30 w-[90%] max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-10 font-inter">
-        {/* LEFT SECTION */}
         <div className="flex flex-col gap-8">
-          {/* Team Card */}
           <motion.div
             className="min-h-[45vh] p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg"
             initial={{ x: -50, opacity: 0 }}
@@ -388,7 +381,6 @@ export default function HackTeamDetailsPage() {
             </div>
           </motion.div>
 
-          {/* Team Info */}
           <motion.div
             className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white"
             initial={{ y: 50, opacity: 0 }}
@@ -429,9 +421,7 @@ export default function HackTeamDetailsPage() {
           </motion.div>
         </div>
 
-        {/* RIGHT SECTION */}
         <div className="flex flex-col gap-8">
-          {/* About Event */}
           <motion.div
             className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white"
             initial={{ y: -50, opacity: 0 }}
@@ -482,7 +472,7 @@ export default function HackTeamDetailsPage() {
                 <p className="font-semibold">
                   Event Link:{" "}
                   <span className="text-[#4ff1f1] hover:underline cursor-pointer">
-                    http://localhost:3000/genai/hack
+                    {team.hackLink}
                   </span>
                 </p>
               </div>
@@ -494,7 +484,6 @@ export default function HackTeamDetailsPage() {
             </div>
           </motion.div>
 
-          {/* Join Team + Contact */}
           <motion.div
             className="p-5 sm:p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white flex flex-col gap-4 sm:gap-6 max-w-full overflow-x-auto"
             initial={{ x: 50, opacity: 0 }}
@@ -507,7 +496,6 @@ export default function HackTeamDetailsPage() {
                   You are the team leader
                 </p>
 
-                {/* Pending Requests */}
                 {requests.filter((r) => r.status === "PENDING").length > 0 ? (
                   <>
                     <h3 className="font-medium text-sm sm:text-base text-[#4ff1f1] mt-2 mb-1">
@@ -561,7 +549,6 @@ export default function HackTeamDetailsPage() {
                               </div>
                             </div>
 
-                            {/* Disable buttons if no spots left */}
                             <div className="flex flex-wrap gap-2 shrink-0 mt-2 sm:mt-0">
                               <button
                                 onClick={() =>
@@ -608,7 +595,6 @@ export default function HackTeamDetailsPage() {
                   </p>
                 )}
 
-                {/* Accepted Members */}
                 {requests.filter((r) => r.status === "ACCEPTED").length > 0 && (
                   <>
                     <h3 className="font-medium text-sm sm:text-base text-[#4ff1f1] mt-4 mb-1">
@@ -696,7 +682,6 @@ export default function HackTeamDetailsPage() {
               </div>
             )}
 
-            {/* Contact Info */}
             <div className="flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm mt-3 sm:mt-4">
               <h2 className="font-semibold text-sm sm:text-lg">Contact</h2>
               {team.teamLeadPhoneNo ? <p>📞 {team.teamLeadPhoneNo}</p> : ""}

@@ -111,7 +111,6 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
     try {
-        /* ---------- Auth ---------- */
         const session = await auth.api.getSession({
             headers: await headers(),
         });
@@ -125,7 +124,6 @@ export async function PATCH(req: Request) {
 
         const userId = session.user.id;
 
-        /* ---------- Body ---------- */
         const body = await req.json();
 
         const {
@@ -144,7 +142,6 @@ export async function PATCH(req: Request) {
             achievements,
         } = body;
 
-        /* ---------- Build Update Object (Partial Safe) ---------- */
         const updateData: Prisma.UserUpdateInput = {};
 
         if (typeof name === "string") updateData.name = name;
@@ -163,20 +160,16 @@ export async function PATCH(req: Request) {
             updateData.skills = skills;
         }
 
-        /* ---------- Update User Fields ---------- */
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: updateData,
         });
 
-        /* ---------- Replace Education ---------- */
         if (Array.isArray(education)) {
-            // Remove old entries
             await prisma.education.deleteMany({
                 where: { userId },
             });
 
-            // Add new ones (ignore empty institutions)
             const cleanedEducation = education.filter(
                 (edu) => edu.institution?.trim() !== ""
             );
@@ -197,14 +190,11 @@ export async function PATCH(req: Request) {
             }
         }
 
-        /* ---------- Replace Achievements ---------- */
         if (Array.isArray(achievements)) {
-            // Remove old entries
             await prisma.achievement.deleteMany({
                 where: { userId },
             });
 
-            // Add new ones (ignore empty titles)
             const cleanedAchievements = achievements.filter(
                 (ach) => ach.title?.trim() !== ""
             );

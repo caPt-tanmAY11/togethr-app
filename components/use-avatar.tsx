@@ -1,4 +1,3 @@
-// components/UserAvatar.tsx
 import { getInitials, getRandomColor } from "@/lib/utils";
 
 interface AvatarProps {

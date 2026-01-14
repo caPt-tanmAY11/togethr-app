@@ -31,13 +31,11 @@ export default function CustomDropdown({
 
     return (
         <div>
-            {/* Label */}
             <label className="block mb-1 text-sm font-medium text-white/70 tracking-wide">
                 {label}
             </label>
 
             <div className="relative">
-                {/* Trigger button */}
                 <button
                     type="button"
                     onClick={() => setIsOpen((prev) => !prev)}
@@ -65,7 +63,6 @@ export default function CustomDropdown({
                     </motion.svg>
                 </button>
 
-                {/* Dropdown menu (opens upward) */}
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div

@@ -38,7 +38,7 @@ export async function PATCH(req: Request) {
             cloudinary.uploader.upload_stream(
                 {
                     folder: `profile-imgs/${userId}`,
-                    public_id: "profile", // always overwrite same image
+                    public_id: "profile",
                     overwrite: true,
                     resource_type: "image",
                 },

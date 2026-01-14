@@ -80,9 +80,9 @@ model Achievement {
   userId      String
   title       String
   description String?
-  issuer      String? // Hackathon, Company, Platform
+  issuer      String?
   category    AchievementCategory?
-  proofUrl    String? // certificate, post, GitHub, drive link
+  proofUrl    String?
   user        User                 @relation(fields: [userId], references: [id])
 
   @@index([userId])
@@ -339,7 +339,7 @@ model Feedback {
   name      String?
   email     String?
   message   String
-  rating    Int? // 1–5 stars
+  rating    Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -2,15 +2,12 @@
 
 export default function ProfilePageSkeleton() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 animate-pulse space-y-6">
-      <div className="mx-auto max-w-7xl px-4 py-14 my-20 font-inter">
-        {/* EDIT BUTTON PLACEHOLDER */}
+    <div className="mx-auto max-w-7xl px-4 py-2 animate-pulse space-y-6">
+      <div className="mx-auto max-w-7xl px-4 py-10 my-10 font-inter">
         <div className="h-10 w-40 rounded-lg bg-white/10 mb-4" />
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* ---------------- LEFT (2/5) ---------------- */}
           <div className="lg:col-span-2 grid gap-6">
-            {/* PROFILE CARD */}
             <div className="relative z-10 w-full rounded-2xl border border-white/10 
               bg-linear-to-br from-white/10 via-white/5 to-transparent 
               backdrop-blur-2xl p-8 sm:p-10 text-white flex flex-col items-center gap-4">
@@ -28,7 +25,6 @@ export default function ProfilePageSkeleton() {
               <div className="h-10 w-3/4 rounded-lg bg-white/10 mt-3" />
             </div>
 
-            {/* CONTACT / LINKS CARD */}
             <div className="relative z-10 w-full rounded-2xl border border-white/10 
               bg-linear-to-br from-white/10 via-white/5 to-transparent 
               backdrop-blur-2xl p-8 sm:p-10 text-white space-y-4">
@@ -47,9 +43,7 @@ export default function ProfilePageSkeleton() {
             </div>
           </div>
 
-          {/* ---------------- RIGHT (3/5) ---------------- */}
           <div className="lg:col-span-3 grid gap-6">
-            {/* ABOUT + SKILLS */}
             <div className="relative z-10 w-full rounded-2xl border border-white/10 
               bg-linear-to-br from-white/10 via-white/5 to-transparent 
               backdrop-blur-2xl p-8 sm:p-10 text-white space-y-4">
@@ -64,7 +58,6 @@ export default function ProfilePageSkeleton() {
               </div>
             </div>
 
-            {/* EDUCATION */}
             <div className="relative z-10 w-full rounded-2xl border border-white/10 
               bg-linear-to-br from-white/10 via-white/5 to-transparent 
               backdrop-blur-2xl p-8 sm:p-10 text-white space-y-4">
@@ -81,7 +74,6 @@ export default function ProfilePageSkeleton() {
               ))}
             </div>
 
-            {/* ACHIEVEMENTS */}
             <div className="relative z-10 w-full rounded-2xl border border-white/10 
               bg-linear-to-br from-white/10 via-white/5 to-transparent 
               backdrop-blur-2xl p-8 sm:p-10 text-white space-y-4">

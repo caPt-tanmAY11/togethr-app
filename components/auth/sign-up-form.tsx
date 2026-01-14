@@ -32,9 +32,14 @@ export default function SignupForm() {
           toast.error(ctx.error.message);
         },
         onSuccess: () => {
-          toast.success(
-            "Account created successfully! Please verify your account using the verification link sent on email..."
-          );
+          toast.success("Account created successfully!");
+
+          setTimeout(() => {
+            toast.info(
+              "A verification link has been sent to your email. Please verify your account."
+            );
+          }, 3000);
+
           router.push("/auth/signin");
         },
       }
@@ -44,7 +49,6 @@ export default function SignupForm() {
   return (
     <form onSubmit={handleFormSubmit}>
       <div className="flex flex-col gap-5 text-white">
-        {/* Full Name */}
         <div className="flex flex-col gap-1">
           <label className="text-xs uppercase tracking-wide text-gray-300 font-medium">
             Full name
@@ -52,18 +56,17 @@ export default function SignupForm() {
           <input
             type="text"
             name="name"
-            placeholder="John Doe"
+            placeholder="Your Name"
             className="
-              bg-[#0f13198e] border border-[#2B303B]
+              bg-[#0f13198e]
               rounded-md py-2 px-3 text-sm placeholder-gray-500
-              focus:outline-none focus:ring-2
+              focus:outline-none focus:ring-1
               focus:ring-[#06a8a8cc] focus:border-transparent
-              transition-all duration-300
+              transition-all duration-300 border border-white/15
             "
           />
         </div>
 
-        {/* Email */}
         <div className="flex flex-col gap-1">
           <label className="text-xs uppercase tracking-wide text-gray-300 font-medium">
             Email
@@ -73,16 +76,15 @@ export default function SignupForm() {
             name="email"
             placeholder="you@example.com"
             className="
-              bg-[#0f13198e] border border-[#2B303B]
+              bg-[#0f13198e]
               rounded-md py-2 px-3 text-sm placeholder-gray-500
-              focus:outline-none focus:ring-2
+              focus:outline-none focus:ring-1
               focus:ring-[#06a8a8cc] focus:border-transparent
-              transition-all duration-300
+              transition-all duration-300 border border-white/15
             "
           />
         </div>
 
-        {/* Password */}
         <div className="flex flex-col gap-1">
           <label className="text-xs uppercase tracking-wide text-gray-300 font-medium">
             Password
@@ -92,16 +94,15 @@ export default function SignupForm() {
             name="password"
             placeholder="••••••••"
             className="
-              bg-[#0f13198e] border border-[#2B303B]
+              bg-[#0f13198e]
               rounded-md py-2 px-3 text-sm placeholder-gray-500
-              focus:outline-none focus:ring-2
+              focus:outline-none focus:ring-1
               focus:ring-[#06a8a8cc] focus:border-transparent
-              transition-all duration-300
+              transition-all duration-300 border border-white/15
             "
           />
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
           className="

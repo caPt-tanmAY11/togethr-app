@@ -17,27 +17,22 @@ export default function ProjectCardSkeleton() {
       "
     >
       <div className="p-6 flex flex-col gap-4">
-        {/* TITLE */}
         <div className="h-6 w-3/4 bg-white/10 rounded" />
 
-        {/* STAGE */}
         <div className="h-4 w-24 bg-white/10 rounded" />
 
-        {/* DESCRIPTION */}
         <div className="space-y-2 mt-3">
           <div className="h-3 w-full bg-white/10 rounded" />
           <div className="h-3 w-[90%] bg-white/10 rounded" />
           <div className="h-3 w-[70%] bg-white/10 rounded" />
         </div>
 
-        {/* SKILLS */}
         <div className="flex flex-wrap gap-2 mt-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-6 w-20 bg-white/10 rounded-lg" />
           ))}
         </div>
 
-        {/* FOOTER */}
         <div className="mt-auto space-y-3">
           <div className="h-4 w-28 bg-white/10 rounded" />
           <div className="h-10 w-full bg-white/10 rounded-lg" />

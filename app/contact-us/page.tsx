@@ -78,7 +78,7 @@ export default function ContactUs() {
             <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight">
               Contact Us
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl mx-auto">
+            <p className="mt-3 text-sm sm:text-lg text-white/70 max-w-xl mx-auto">
               Have a question, feedback, or partnership idea? We’d love to hear
               from you.
             </p>
@@ -101,10 +101,10 @@ export default function ContactUs() {
               "
             >
               <div>
-                <h3 className="text-xl font-semibold mb-2">Let’s talk</h3>
+                <h3 className="text-2xl font-semibold mb-2">Let’s talk</h3>
                 <p className="text-white/70 text-sm leading-relaxed">
                   Whether you’re facing an issue, have a feature suggestion, or
-                  want to collaborate — drop us a message and we’ll get back to
+                  want to collaborate, drop us a message and we’ll get back to
                   you as soon as possible.
                 </p>
               </div>
@@ -133,10 +133,10 @@ export default function ContactUs() {
               {/* Name */}
               <input
                 type="text"
-                placeholder="John Doe"
+                placeholder="Your name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-3 text-sm outline-none focus:border-[#4ff1f1] focus:ring-1 focus:ring-[#4ff1f1]/40 transition"
+                className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
               />
 
               {/* Email */}
@@ -145,7 +145,7 @@ export default function ContactUs() {
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-3 text-sm outline-none focus:border-[#4ff1f1] focus:ring-1 focus:ring-[#4ff1f1]/40 transition"
+                className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
               />
 
               {/* Message */}
@@ -154,13 +154,13 @@ export default function ContactUs() {
                 placeholder="Tell us how we can help..."
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-3 text-sm outline-none resize-none focus:border-[#4ff1f1] focus:ring-1 focus:ring-[#4ff1f1]/40 transition"
+                className="w-full rounded-lg bg-white/10 px-4 py-2.5 resize-none text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
               />
 
               <button
                 type="submit"
                 disabled={loading}
-                className="auth-form-main-btn cursor-pointer text-white rounded-lg w-full py-3 font-medium transition-all duration-300 hover:scale-[1.03] active:scale-95 disabled:opacity-60"
+                className="auth-form-main-btn cursor-pointer text-white rounded-lg w-full py-2 sm:py-3 font-medium transition-all duration-300 hover:scale-[1.03] active:scale-95 disabled:opacity-60"
               >
                 {loading ? "Sending..." : "Send Message"}
               </button>

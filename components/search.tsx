@@ -44,10 +44,8 @@ export default function UserSearch() {
   }, [debouncedQuery]);
 
   return (
-    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50">
-      {/* WRAPPER FOR INPUT + DROPDOWN */}
+    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20">
       <div className="relative w-[90vw] sm:w-[70vw] max-w-xl sm:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto">
-        {/* SEARCH INPUT */}
         <div
           className={`
         relative
@@ -77,7 +75,6 @@ export default function UserSearch() {
           />
         </div>
 
-        {/* DROPDOWN */}
         {(loading || users.length > 0) && (
           <div
             className="
@@ -91,7 +88,6 @@ export default function UserSearch() {
           max-h-[60vh] overflow-y-auto
         "
           >
-            {/* LOADING */}
             {loading && (
               <div className="flex items-center gap-2 px-4 py-3 text-sm text-white/60">
                 <Loader2 className="animate-spin" size={16} />
@@ -99,8 +95,6 @@ export default function UserSearch() {
               </div>
             )}
 
-            {/* RESULTS */}
-            {/* RESULTS */}
             {!loading &&
               users.map((user, index) => (
                 <Link
@@ -134,7 +128,6 @@ export default function UserSearch() {
                 </Link>
               ))}
 
-            {/* EMPTY STATE */}
             {!loading && users.length === 0 && debouncedQuery && (
               <div className="px-4 py-4 text-sm text-white/50 text-center">
                 No users found

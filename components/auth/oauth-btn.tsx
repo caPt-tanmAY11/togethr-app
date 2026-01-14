@@ -63,7 +63,6 @@ export default function SignInOauthButton({ provider, signUp }: SignInOauthButto
                 {isPending ? "Loading..." : `Continue with ${providerName}`}
             </span>
 
-            {/* soft hover gradient overlay */}
             <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,255,255,0.1)] to-[rgba(123,159,159,0.2)] opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
         </button>
     );

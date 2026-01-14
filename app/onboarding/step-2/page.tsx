@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import OnboardingStep2Skeleton from "@/components/skeletons/onboarding-step2";
 
 export default function OnboardingStep2() {
   const router = useRouter();
@@ -19,7 +20,6 @@ export default function OnboardingStep2() {
   const [loading, setLoading] = useState(false);
   const [hydrating, setHydrating] = useState(true);
 
-  /* -------------------- LOAD SAVED DATA -------------------- */
   useEffect(() => {
     async function loadData() {
       try {
@@ -37,7 +37,6 @@ export default function OnboardingStep2() {
           XUrl: data.XUrl ?? "",
         });
       } catch {
-        // Silent fail – onboarding must still work
       } finally {
         setHydrating(false);
       }
@@ -46,7 +45,6 @@ export default function OnboardingStep2() {
     loadData();
   }, []);
 
-  /* -------------------- HANDLERS -------------------- */
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({
       ...prev,
@@ -67,14 +65,12 @@ export default function OnboardingStep2() {
 
       const data = await res.json();
 
-      /* ---------- Auth ---------- */
       if (res.status === 401) {
         toast.error("Session expired. Please log in again.");
         router.push("/login");
         return;
       }
 
-      /* ---------- Validation ---------- */
       if (res.status === 400) {
         if (
           Array.isArray(data.fields) &&
@@ -87,13 +83,11 @@ export default function OnboardingStep2() {
         return;
       }
 
-      /* ---------- Other errors ---------- */
       if (!res.ok) {
         toast.error(data?.error || "Something went wrong");
         return;
       }
 
-      /* ---------- Success ---------- */
       toast.success("Step 2 completed");
       router.push("/onboarding/step-3");
     } catch {
@@ -103,35 +97,31 @@ export default function OnboardingStep2() {
     }
   }
 
-  /* -------------------- HYDRATION STATE -------------------- */
   if (hydrating) {
-    return (
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-white/5 p-10 text-white/60">
-        Loading your details...
-      </div>
-    );
+    return <OnboardingStep2Skeleton />;
   }
 
-  /* -------------------- UI -------------------- */
   return (
     <div
-      className="relative flex justify-center items-center min-h-screen
-    px-3 sm:px-6 lg:px-8 overflow-hidden"
+      className="relative flex justify-center items-center
+    px-3 sm:px-6 lg:px-8 overflow-hidden w-[95vw] my-auto
+      max-w-md
+      sm:max-w-lg
+      lg:max-w-xl"
     >
       <motion.div
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="
-        relative z-10 backdrop-blur-2xl
-        bg-linear-to-br from-white/10 via-white/5 to-transparent
-        border border-white/10 rounded-2xl
-        p-6 sm:p-8 md:p-10
-        w-full max-w-sm sm:max-w-md md:max-w-lg
-        text-white
-      "
+    relative z-10 backdrop-blur-2xl
+    bg-linear-to-br from-white/10 via-white/5 to-transparent
+    border border-white/10 rounded-2xl
+    p-6 sm:p-8 md:p-10
+    w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl
+    text-white
+  "
       >
-        {/* STEP INDICATOR */}
         <div className="mb-5 sm:mb-6">
           <div className="flex items-center justify-between gap-4">
             <span className="text-[10px] sm:text-xs tracking-widest text-white/60">
@@ -147,7 +137,6 @@ export default function OnboardingStep2() {
           </div>
         </div>
 
-        {/* HEADER */}
         <div className="mb-5 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-semibold">
             Your online presence
@@ -157,9 +146,7 @@ export default function OnboardingStep2() {
           </p>
         </div>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-          {/* Organization */}
           <div>
             <label className="block text-xs sm:text-sm mb-1">
               Current organization *
@@ -170,12 +157,12 @@ export default function OnboardingStep2() {
               onChange={handleChange}
               placeholder="College, company, or community"
               className="w-full rounded-lg bg-white/5 border border-white/10
-              px-3 sm:px-4 py-2 text-xs sm:text-sm
+              px-2 sm:px-3 py-1.5
+            sm:py-2.5 text-xs sm:text-sm
               outline-none focus:border-white/30"
             />
           </div>
 
-          {/* LinkedIn */}
           <div>
             <label className="block text-xs sm:text-sm mb-1">LinkedIn</label>
             <input
@@ -184,12 +171,12 @@ export default function OnboardingStep2() {
               onChange={handleChange}
               placeholder="https://linkedin.com/in/username"
               className="w-full rounded-lg bg-white/5 border border-white/10
-              px-3 sm:px-4 py-2 text-xs sm:text-sm
+              px-2 sm:px-3 py-1.5
+            sm:py-2.5 text-xs sm:text-sm
               outline-none focus:border-white/30"
             />
           </div>
 
-          {/* GitHub */}
           <div>
             <label className="block text-xs sm:text-sm mb-1">GitHub</label>
             <input
@@ -198,12 +185,12 @@ export default function OnboardingStep2() {
               onChange={handleChange}
               placeholder="https://github.com/username"
               className="w-full rounded-lg bg-white/5 border border-white/10
-              px-3 sm:px-4 py-2 text-xs sm:text-sm
+              px-2 sm:px-3 py-1.5
+            sm:py-2.5 text-xs sm:text-sm
               outline-none focus:border-white/30"
             />
           </div>
 
-          {/* X */}
           <div>
             <label className="block text-xs sm:text-sm mb-1">X</label>
             <input
@@ -212,12 +199,12 @@ export default function OnboardingStep2() {
               onChange={handleChange}
               placeholder="https://x.com/username"
               className="w-full rounded-lg bg-white/5 border border-white/10
-              px-3 sm:px-4 py-2 text-xs sm:text-sm
+              px-2 sm:px-3 py-1.5
+            sm:py-2.5 text-xs sm:text-sm
               outline-none focus:border-white/30"
             />
           </div>
 
-          {/* Portfolio */}
           <div>
             <label className="block text-xs sm:text-sm mb-1">
               Portfolio / Website
@@ -228,12 +215,12 @@ export default function OnboardingStep2() {
               onChange={handleChange}
               placeholder="https://yourwebsite.dev"
               className="w-full rounded-lg bg-white/5 border border-white/10
-              px-3 sm:px-4 py-2 text-xs sm:text-sm
+              px-2 sm:px-3 py-1.5
+            sm:py-2.5 text-xs sm:text-sm
               outline-none focus:border-white/30"
             />
           </div>
 
-          {/* ACTIONS */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-2">
             <button
               type="button"
@@ -241,7 +228,7 @@ export default function OnboardingStep2() {
               className="
               w-full sm:w-1/2
               rounded-lg border border-white/20
-              py-2 text-xs sm:text-sm
+              py-2 sm:py-3 text-xs sm:text-sm
               text-white/70 hover:bg-white/5 transition cursor-pointer
             "
             >
@@ -254,7 +241,7 @@ export default function OnboardingStep2() {
               className="w-full sm:w-1/2
           auth-form-main-btn text-xs sm:text-sm
           rounded-lg
-          py-1.5 sm:py-3
+          py-2 sm:py-3
           font-medium
           disabled:opacity-60 cursor-pointer"
 

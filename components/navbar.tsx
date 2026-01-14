@@ -9,6 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { UserAvatar } from "./use-avatar";
 import { MessageSquare } from "lucide-react";
 import { useFeedback } from "@/components/feeback/feedback-context";
+import { createPortal } from "react-dom";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -29,7 +30,6 @@ export default function Navbar() {
 
   const { openFeedback } = useFeedback();
 
-  /* ------------------ THEME ------------------ */
   const isProjects = pathname.startsWith("/main/projects");
 
   const themeColor = isProjects ? "#f36262" : "#27b49c";
@@ -43,7 +43,6 @@ export default function Navbar() {
     btnHover = "#fc8e8eb7";
   }
 
-  /* ------------------ Create Button ------------------ */
   const createConfig = (() => {
     if (pathname.startsWith("/main/hacks-teamup")) {
       return { label: "Create Team", href: "/main/hacks-teamup/create" };
@@ -54,7 +53,6 @@ export default function Navbar() {
     return null;
   })();
 
-  /* ------------------ Close profile dropdown ------------------ */
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -69,7 +67,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ------------------ Sign out ------------------ */
   const handleSignOut = async () => {
     await authClient.signOut();
     setSignoutModalOpen(false);
@@ -83,16 +80,14 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ===================== NAVBAR ===================== */}
       <motion.nav
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="fixed top-0 left-0 w-full h-16 z-998
         backdrop-blur-xl bg-[#0000007d] border-b border-white/10
-        flex items-center justify-between px-6 sm:px-10"
+        flex items-center justify-between px-6 sm:px-10 font-inter"
       >
-        {/* LOGO */}
         <Link
           href="/main/hacks-teamup"
           className="text-white font-bold text-xl flex items-center gap-1"
@@ -101,9 +96,7 @@ export default function Navbar() {
           <span style={{ color: themeColor }}>.</span>
         </Link>
 
-        {/* ===================== CENTER NAV ===================== */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 gap-3">
-          {/* GLOW AURA */}
           <motion.div
             key={themeColor}
             initial={{ opacity: 0, scale: 0.8 }}
@@ -126,7 +119,6 @@ export default function Navbar() {
                 href={link.href}
                 className="relative px-5 py-2 rounded-full overflow-hidden"
               >
-                {/* ACTIVE GLASS PILL */}
                 {isActive && (
                   <motion.div
                     layoutId="nav-pill"
@@ -148,7 +140,6 @@ export default function Navbar() {
                   ></motion.div>
                 )}
 
-                {/* TEXT */}
                 <motion.span
                   animate={{
                     y: isActive ? -1 : 0,
@@ -166,12 +157,11 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* ===================== RIGHT ===================== */}
         <div className="hidden md:flex items-center gap-4 relative">
           {createConfig && (
             <Link
               href={createConfig.href}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm
+              className={`flex items-center font-semibold gap-2 px-4 py-1.5 rounded-md text-sm
               text-white transition-all bg-[${btnMain}] hover:bg-[${btnHover}]`}
             >
               <Plus size={16} />
@@ -184,7 +174,7 @@ export default function Navbar() {
             className="flex items-center gap-2
   text-gray-300 hover:text-white
   text-sm px-4 py-1.5 rounded-md bg-white/10
-  hover:bg-white/20 cursor-pointer"
+  hover:bg-white/20 cursor-pointer font-semibold"
           >
             <MessageSquare size={16} />
             Feedback
@@ -212,7 +202,7 @@ export default function Navbar() {
                       exit={{ opacity: 0, y: -5, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
                       className="absolute right-0 mt-3 w-64 rounded-xl
-                      bg-[#0a0a0acc] backdrop-blur-2xl border border-white/10 p-4 z-50"
+                      bg-[#0f0f0f] backdrop-blur-2xl border border-white/10 p-4 z-50"
                     >
                       <div className="flex items-center gap-3 mb-3">
                         <UserAvatar
@@ -265,13 +255,12 @@ export default function Navbar() {
                 className="flex items-center gap-2
   text-gray-300 hover:text-white
   text-sm px-4 py-1.5 rounded-2xl bg-white/10
-  hover:bg-white/20 cursor-pointer"
+  hover:bg-white/20 cursor-pointer font-semibold"
               >
                 Sign in
               </Link>
             ))}
         </div>
-        {/* ===================== MOBILE HAMBURGER ===================== */}
         <button
           onClick={() => setMobileMenuOpen((p) => !p)}
           className="md:hidden text-white p-2 rounded-lg hover:bg-white/10"
@@ -280,49 +269,51 @@ export default function Navbar() {
         </button>
       </motion.nav>
 
-      {/* ===================== SIGNOUT MODAL ===================== */}
-      <AnimatePresence>
-        {signoutModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-0"
-          >
-            <motion.div
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.94, opacity: 0 }}
-              className="bg-zinc-950 border border-white/10 rounded-2xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm"
-            >
-              <h2 className="text-white font-semibold text-lg sm:text-xl">
-                Sign out?
-              </h2>
-              <p className="text-gray-400 text-sm mt-2 sm:mt-3 break-words">
-                You’ll be logged out.
-              </p>
-
-              <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4 sm:mt-6">
-                <button
-                  onClick={() => setSignoutModalOpen(false)}
-                  className="text-gray-400 hover:text-white cursor-pointer w-full sm:w-auto text-center"
+      {typeof window !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {signoutModalOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-998 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-0"
+              >
+                <motion.div
+                  initial={{ scale: 0.94, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.94, opacity: 0 }}
+                  className="bg-zinc-950 border border-white/10 rounded-2xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm"
                 >
-                  Cancel
-                </button>
+                  <h2 className="text-white font-semibold text-lg sm:text-xl">
+                    Sign out?
+                  </h2>
+                  <p className="text-gray-400 text-sm mt-2 sm:mt-3 break-words">
+                    You’ll be logged out.
+                  </p>
 
-                <button
-                  onClick={handleSignOut}
-                  className={`px-4 py-2 rounded-lg text-white cursor-pointer w-full sm:w-auto text-center bg-[${btnMain}] hover:bg-[${btnHover}]`}
-                >
-                  Sign out
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4 sm:mt-6">
+                    <button
+                      onClick={() => setSignoutModalOpen(false)}
+                      className="text-gray-400 hover:text-white cursor-pointer w-full sm:w-auto text-center"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={handleSignOut}
+                      className={`px-4 py-2 rounded-lg text-white cursor-pointer w-full sm:w-auto text-center bg-[${btnMain}] hover:bg-[${btnHover}]`}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
 
-      {/* ===================== MOBILE MENU ===================== */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -334,7 +325,6 @@ export default function Navbar() {
       bg-gradient-to-b from-black/95 to-black/90
       backdrop-blur-2xl"
           >
-            {/* CLOSE BUTTON */}
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -348,9 +338,7 @@ export default function Navbar() {
               <X size={24} />
             </motion.button>
 
-            {/* CONTENT */}
             <div className="h-full w-full flex flex-col px-6 pt-24 pb-8">
-              {/* NAV LINKS */}
               <motion.div
                 initial="hidden"
                 animate="show"
@@ -383,7 +371,6 @@ export default function Navbar() {
                         whileTap={{ scale: 0.96 }}
                         className="relative"
                       >
-                        {/* ACTIVE BACKDROP */}
                         {active && (
                           <motion.div
                             layoutId="mobile-active-pill"
@@ -397,7 +384,6 @@ export default function Navbar() {
                           />
                         )}
 
-                        {/* LEFT ACCENT BAR */}
                         {active && (
                           <motion.div
                             layoutId="mobile-active-bar"
@@ -422,7 +408,6 @@ export default function Navbar() {
                 })}
               </motion.div>
 
-              {/* ACTIONS */}
               <div className="mt-12 flex flex-col gap-4">
                 {createConfig && (
                   <motion.div whileTap={{ scale: 0.97 }}>
@@ -455,7 +440,6 @@ export default function Navbar() {
                 </motion.button>
               </div>
 
-              {/* AUTH */}
               <div
                 className="mt-auto pt-10 border-t border-white/10
         flex flex-col gap-5"

@@ -138,9 +138,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
   }
 }
 
-/* =========================
-   UPDATE PROFILE (OWNER ONLY)
-========================= */
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -171,7 +168,6 @@ export async function PATCH(
       );
     }
 
-    // 🔐 OWNER CHECK
     if (existingUser.id !== session.user.id) {
       return NextResponse.json(
         { success: false, error: "Forbidden" },

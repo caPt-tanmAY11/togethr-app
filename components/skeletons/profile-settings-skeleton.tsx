@@ -1,7 +1,6 @@
 export default function ProfileSettingsSkeleton() {
   return (
     <div className="mx-auto max-w-3xl space-y-10 my-20 animate-pulse">
-      {/* PROFILE SECTION */}
       <SkeletonSection>
         <SkeletonTitle />
 
@@ -17,7 +16,6 @@ export default function ProfileSettingsSkeleton() {
         <SkeletonTextarea />
       </SkeletonSection>
 
-      {/* SOCIAL LINKS */}
       <SkeletonSection>
         <SkeletonTitle />
         <SkeletonInput />
@@ -26,7 +24,6 @@ export default function ProfileSettingsSkeleton() {
         <SkeletonInput />
       </SkeletonSection>
 
-      {/* SKILLS */}
       <SkeletonSection>
         <SkeletonTitle />
         <div className="flex flex-wrap gap-2">
@@ -36,10 +33,8 @@ export default function ProfileSettingsSkeleton() {
         </div>
       </SkeletonSection>
 
-      {/* SAVE BUTTON */}
       <div className="h-12 w-full rounded-xl bg-white/10" />
 
-      {/* SECURITY */}
       <SkeletonSection>
         <SkeletonTitle />
         <div className="h-4 w-40 bg-white/10 rounded" />
@@ -48,7 +43,6 @@ export default function ProfileSettingsSkeleton() {
   );
 }
 
-/* ---------- Skeleton Pieces ---------- */
 
 function SkeletonSection({ children }: { children: React.ReactNode }) {
   return (

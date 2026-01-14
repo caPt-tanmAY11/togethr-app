@@ -4,6 +4,7 @@ import Navbar from "@/components/navbar";
 import React from "react";
 import { usePathname } from "next/navigation";
 import UserSearch from "@/components/search";
+import Footer from "@/components/footer";
 
 export default function MainLayout({
   children,
@@ -17,13 +18,13 @@ export default function MainLayout({
     : "bg-main-blurb";
 
   return (
-    <div className="relative min-h-screen w-full bg-[#090a15] overflow-hidden">
-      <Navbar />
-      <UserSearch />
+    <>
+      <div className="relative min-h-screen w-full bg-[#090a15] overflow-hidden">
+        <Navbar />
+        <UserSearch />
 
-      {/* Background blur */}
-      <div
-        className={`
+        <div
+          className={`
       pointer-events-none
       fixed
       -top-40 sm:-top-52 md:-top-64
@@ -35,12 +36,13 @@ export default function MainLayout({
       opacity-100
       blur-[180px] sm:blur-[220px]
     `}
-      />
+        />
 
-      {/* Page content */}
-      <div className="relative z-10 pt-24 sm:pt-28 px-4 sm:px-6 lg:px-10">
-        {children}
+        <div className="relative z-10 pt-24 sm:pt-28 px-4 sm:px-6 lg:px-10">
+          {children}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

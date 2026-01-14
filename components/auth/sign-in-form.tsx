@@ -38,7 +38,7 @@ export default function SigninForm() {
           const user = ctx.data.user;
 
           if (user.email === adminEmail) {
-            router.replace("/admin/dashboard");
+            router.replace("/admin");
             return;
           }
 
@@ -55,7 +55,6 @@ export default function SigninForm() {
   return (
     <form onSubmit={handleFormSubmit}>
       <div className="flex flex-col gap-5 text-white">
-        {/* Email */}
         <div className="flex flex-col gap-1">
           <label
             htmlFor="email"
@@ -68,12 +67,11 @@ export default function SigninForm() {
             id="email"
             name="email"
             placeholder="you@example.com"
-            className="bg-[#0f13198e] border border-[#2B303B] rounded-md py-2 px-3 text-sm placeholder-gray-500
-                        focus:outline-none focus:ring-2 focus:ring-[#06a8a8cc] focus:border-transparent transition-all duration-300"
+            className="bg-[#0f13198e] rounded-md py-2 px-3 text-sm placeholder-gray-500
+                        focus:outline-none focus:ring-1 focus:ring-[#06a8a8cc] focus:border-transparent transition-all duration-300 border border-white/15"
           />
         </div>
 
-        {/* Password */}
         <div className="flex flex-col gap-1 relative">
           <label
             htmlFor="password"
@@ -87,8 +85,8 @@ export default function SigninForm() {
             id="password"
             name="password"
             placeholder="••••••••"
-            className="bg-[#0f13198e] border border-[#2B303B] rounded-md py-2 px-3 text-sm placeholder-gray-500
-                        focus:outline-none focus:ring-2 focus:ring-[#06a8a8cc] focus:border-transparent transition-all duration-300 pr-10"
+            className="bg-[#0f13198e] rounded-md py-2 px-3 text-sm placeholder-gray-500
+                        focus:outline-none focus:ring-1 focus:ring-[#06a8a8cc] focus:border-transparent transition-all duration-300 pr-10 border border-white/15"
           />
 
           <button
@@ -105,7 +103,6 @@ export default function SigninForm() {
           </button>
         </div>
 
-        {/* Forgot Password */}
         <div className="text-right pr-2">
           <Link
             href="/auth/forgot-password"
@@ -115,7 +112,6 @@ export default function SigninForm() {
           </Link>
         </div>
 
-        {/* Sign In Button */}
         <button
           type="submit"
           className="auth-form-main-btn text-white rounded-lg py-2 px-5 font-medium transition-all duration-300

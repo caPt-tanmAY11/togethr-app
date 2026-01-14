@@ -14,7 +14,7 @@ export async function GET(req: Request) {
             where: {
                 name: {
                     contains: query,
-                    mode: "insensitive", // case-insensitive search
+                    mode: "insensitive",
                 },
             },
             select: {
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
                 image: true,
                 headline: true,
             },
-            take: 10, // limit results
+            take: 10,
         });
 
         return NextResponse.json(users);

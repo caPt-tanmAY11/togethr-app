@@ -77,10 +77,6 @@ export async function proxy(req: NextRequest) {
     const isAdmin =
         session?.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
-    /* ---------------------------------
-       ROUTE GROUPS
-    ----------------------------------*/
-
     const isPublicViewRoute =
         pathname === "/main/hacks-teamup" ||
         pathname === "/main/projects";
@@ -96,9 +92,6 @@ export async function proxy(req: NextRequest) {
     const isOnboardingRoute = pathname.startsWith("/onboarding");
     const isAdminRoute = pathname.startsWith("/admin");
 
-    /* ---------------------------------
-       ADMIN GUARD
-    ----------------------------------*/
     if (isAdminRoute) {
         if (!isAuthenticated) {
             return redirectToLogin(req);
@@ -109,16 +102,10 @@ export async function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
-    /* ---------------------------------
-       PUBLIC VIEW (NO AUTH REQUIRED)
-    ----------------------------------*/
     if (isPublicViewRoute && !isAuthenticated) {
         return NextResponse.next();
     }
 
-    /* ---------------------------------
-       PROTECTED ROUTES (AUTH REQUIRED)
-    ----------------------------------*/
     if (
         isProtectedCreateRoute ||
         (isProtectedDynamicRoute && !isPublicViewRoute)
@@ -128,29 +115,23 @@ export async function proxy(req: NextRequest) {
         }
     }
 
-    /* ---------------------------------
-       ONBOARDING / EMAIL VERIFICATION
-    ----------------------------------*/
     if (isAuthenticated) {
         const emailVerified = session.user.emailVerified;
         const onboardingCompleted =
             session.user.onboardingStatus === "COMPLETED";
 
-        // Force onboarding if email not verified
         if (!emailVerified && !isOnboardingRoute) {
             return NextResponse.redirect(
                 new URL("/onboarding", req.url)
             );
         }
 
-        // Force onboarding steps
         if (!onboardingCompleted && !isOnboardingRoute) {
             return NextResponse.redirect(
                 new URL("/onboarding/step-1", req.url)
             );
         }
 
-        // Prevent going back to onboarding
         if (onboardingCompleted && isOnboardingRoute) {
             return NextResponse.redirect(
                 new URL("/main/hacks-teamup", req.url)
@@ -161,9 +142,6 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
 }
 
-/* ---------------------------------
-   HELPERS
-----------------------------------*/
 function redirectToLogin(req: NextRequest) {
     const loginUrl = new URL("/auth/signin", req.url);
     loginUrl.searchParams.set("returnTo", req.nextUrl.pathname);

@@ -5,7 +5,6 @@ import { headers } from "next/headers";
 
 export async function GET() {
     try {
-        /* -------------------- AUTH -------------------- */
         const session = await auth.api.getSession({
             headers: await headers(),
         });
@@ -16,11 +15,9 @@ export async function GET() {
                 { status: 401 }
             );
         }
-        /* -------------------- FETCH USER -------------------- */
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
             select: {
-                /* onboarding meta */
                 onboardingStatus: true,
 
                 /* step 1 */
@@ -71,7 +68,6 @@ export async function GET() {
             );
         }
 
-        /* -------------------- RESPONSE -------------------- */
         return NextResponse.json(user);
     } catch (error) {
         console.error("GET /api/onboarding/me error:", error);

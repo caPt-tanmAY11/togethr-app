@@ -4,7 +4,6 @@ import prisma from "./prisma";
 import { slugify } from "./utils";
 import { sendEmail } from "./send-email";
 import { resetPasswordEmail } from "@/components/reset-password";
-import { OnboardingStatus } from "./generated/prisma/enums";
 import { verifyEmailTemplate } from "./email-templates/verify-email";
 
 export const auth = betterAuth({

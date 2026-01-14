@@ -209,15 +209,6 @@ export async function GET(req: NextRequest) {
             ?.split(",")
             .map(skill => skill.toLowerCase().trim());
 
-
-        console.log({
-            mode,
-            teamSize,
-            location,
-            skills,
-            scope
-        })
-
         const whereClause: Prisma.HackTeamWhereInput = {
             ...(mode && { hackMode: mode }),
             ...(teamSize && { size: Number(teamSize) }),

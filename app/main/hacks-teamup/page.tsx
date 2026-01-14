@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import TeamSizeDropdown from "@/components/team-size-dropdown";
 import HackTeamupCardSkeleton from "@/components/skeletons/hack-teamup-card-skeleton";
 import { authClient } from "@/lib/auth-client";
+import { createPortal } from "react-dom";
 
 interface HackTeamBrief {
   teamId: string;
@@ -71,24 +72,24 @@ export default function HackTeamUp() {
     router.push("/main/hacks-teamup", { scroll: false });
   }
 
-  const FilterModal = (
-    <AnimatePresence>
-      {showFilter && (
-        <>
-          {/* BACKDROP */}
-          <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowFilter(false)}
-          />
+  const FilterModal =
+    typeof window !== "undefined" &&
+    createPortal(
+      <AnimatePresence>
+        {showFilter && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-998"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowFilter(false)}
+            />
 
-          {/* MODAL */}
-          <motion.form
-            onSubmit={handleApplyFilters}
-            className="
-            fixed top-1/2 left-1/2 z-50
+            <motion.form
+              onSubmit={handleApplyFilters}
+              className="
+            fixed top-1/2 left-1/2 z-999
             w-[90%] max-w-md
             -translate-x-1/2 -translate-y-1/2
             rounded-2xl
@@ -96,51 +97,48 @@ export default function HackTeamUp() {
             border border-white/10
             p-6 text-white
           "
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-          >
-            {/* HEADER */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">Filter Teams</h2>
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">Filter Teams</h2>
 
-              <button
-                type="button"
-                onClick={() => setShowFilter(false)}
-                className="
+                <button
+                  type="button"
+                  onClick={() => setShowFilter(false)}
+                  className="
                 text-white/60 hover:text-white
                 transition
                 text-lg leading-none cursor-pointer
               "
-                aria-label="Close filter modal"
-              >
-                ✕
-              </button>
-            </div>
+                  aria-label="Close filter modal"
+                >
+                  ✕
+                </button>
+              </div>
 
-            {/* CONTENT */}
-            <div className="flex flex-col gap-5">
-              {/* -------- Scope -------- */}
-              {session && (
-                <div>
-                  <label className="text-sm text-white/60 mb-2 block">
-                    Team Scope
-                  </label>
+              <div className="flex flex-col gap-5">
+                {session && (
+                  <div>
+                    <label className="text-sm text-white/60 mb-2 block">
+                      Team Scope
+                    </label>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        "ALL",
-                        "MY_TEAM",
-                        "JOINED_IN",
-                        "REQUESTED",
-                      ] as TeamScope[]
-                    ).map((scope) => (
-                      <button
-                        key={scope}
-                        type="button"
-                        onClick={() => setScopeFilter(scope)}
-                        className={`
+                    <div className="grid grid-cols-2 gap-2">
+                      {(
+                        [
+                          "ALL",
+                          "MY_TEAM",
+                          "JOINED_IN",
+                          "REQUESTED",
+                        ] as TeamScope[]
+                      ).map((scope) => (
+                        <button
+                          key={scope}
+                          type="button"
+                          onClick={() => setScopeFilter(scope)}
+                          className={`
                         rounded-lg px-3 py-2 text-sm border transition cursor-pointer
                         ${
                           scopeFilter === scope
@@ -148,20 +146,19 @@ export default function HackTeamUp() {
                             : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
                         }
                       `}
-                      >
-                        {scope.replace("_", " ")}
-                      </button>
-                    ))}
+                        >
+                          {scope.replace("_", " ")}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Location */}
-              <input
-                placeholder="Location (Mumbai, Pune...)"
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                className="
+                <input
+                  placeholder="Location (Mumbai, Pune...)"
+                  value={locationFilter}
+                  onChange={(e) => setLocationFilter(e.target.value)}
+                  className="
                 bg-white/10
                 px-3 py-2
                 rounded-md
@@ -169,65 +166,62 @@ export default function HackTeamUp() {
                 border border-white/10
                 focus:border-teal-400/60
               "
-              />
+                />
 
-              {/* Hack Mode */}
-              <CustomDropdown
-                label=""
-                options={["ANY", "INPERSON", "VIRTUAL", "HYBRID"]}
-                placeholder="Select hack mode"
-                selected={hackModeFilter}
-                setSelected={setHackModeFilter}
-              />
+                <CustomDropdown
+                  label=""
+                  options={["ANY", "INPERSON", "VIRTUAL", "HYBRID"]}
+                  placeholder="Select hack mode"
+                  selected={hackModeFilter}
+                  setSelected={setHackModeFilter}
+                />
 
-              {/* Team Size */}
-              <TeamSizeDropdown
-                label=""
-                options={teamSizeOptions}
-                selected={teamSizeFilter}
-                setSelected={setSelectedTeamSizeFilter}
-                required="false"
-              />
+                <TeamSizeDropdown
+                  label=""
+                  options={teamSizeOptions}
+                  selected={teamSizeFilter}
+                  setSelected={setSelectedTeamSizeFilter}
+                  required="false"
+                />
 
-              {/* Skills */}
-              <SkillStackSection
-                elements={skills}
-                setElements={setSkills}
-                type="skillstack"
-                section="hack-team"
-              />
-            </div>
+                <SkillStackSection
+                  elements={skills}
+                  setElements={setSkills}
+                  type="skillstack"
+                  section="hack-team"
+                />
+              </div>
 
-            {/* ACTIONS */}
-            <div className="flex gap-3 mt-8">
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="
                 flex-1
                 bg-white/10 hover:bg-white/20
                 py-2 rounded-lg transition cursor-pointer
               "
-              >
-                Reset
-              </button>
+                >
+                  Reset
+                </button>
 
-              <button
-                type="submit"
-                className="
+                <button
+                  type="submit"
+                  className="
                 flex-1
                 bg-[#236565] hover:bg-[#2f8787]
                 py-2 rounded-lg transition cursor-pointer
               "
-              >
-                Apply
-              </button>
-            </div>
-          </motion.form>
-        </>
-      )}
-    </AnimatePresence>
-  );
+                >
+                  Apply
+                </button>
+              </div>
+            </motion.form>
+          </>
+        )}
+      </AnimatePresence>,
+      document.body
+    );
 
   const router = useRouter();
 
@@ -286,13 +280,11 @@ export default function HackTeamUp() {
   if (loading) {
     return (
       <>
-        {/* HEADER SKELETON */}
         <div className="flex items-center justify-between mt-15 sm:mt-20 max-w-7xl mx-auto animate-pulse">
           <div className="h-7 w-40 bg-white/10 rounded" />
           <div className="h-9 w-24 bg-white/10 rounded-lg" />
         </div>
 
-        {/* GRID SKELETON */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 my-14 sm:my-20 max-w-7xl mx-auto">
           {Array.from({ length: 6 }).map((_, i) => (
             <HackTeamupCardSkeleton key={i} />
@@ -312,7 +304,6 @@ export default function HackTeamUp() {
   if (!loading && teams.length === 0) {
     return (
       <>
-        {/* HEADER */}
         <div className="flex items-center justify-between mt-15 sm:mt-20 font-inter max-w-7xl mx-auto">
           <div className="relative inline-block">
             <h1 className="text-lg sm:text-2xl font-extrabold text-white">
@@ -335,7 +326,6 @@ export default function HackTeamUp() {
           </button>
         </div>
 
-        {/* EMPTY STATE */}
         <div className="my-24 flex flex-col items-center justify-center text-center text-white/80 px-4">
           <div
             className="
@@ -385,14 +375,12 @@ export default function HackTeamUp() {
 
   return (
     <>
-      {/* HEADER */}
       <div className="flex items-center justify-between mt-15 sm:mt-20 font-inter max-w-7xl mx-auto">
         <div className="relative inline-block">
           <h1 className="text-lg sm:text-2xl font-extrabold text-white">
             Hack Teams
           </h1>
 
-          {/* Underline */}
           <span
             className="absolute left-0 -bottom-1 w-full h-0.75 rounded-full
       bg-linear-to-r from-[#216363] via-[#349292] to-[#216363]
@@ -400,7 +388,6 @@ export default function HackTeamUp() {
           />
         </div>
 
-        {/* FILTER BUTTON */}
         <button
           onClick={() => setShowFilter(true)}
           className="bg-[#236565] hover:bg-[#2f8787]
@@ -410,7 +397,6 @@ export default function HackTeamUp() {
         </button>
       </div>
 
-      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 my-14 sm:my-20 max-w-7xl mx-auto">
         {teams.map((team) => (
           <div

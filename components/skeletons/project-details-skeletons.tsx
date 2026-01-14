@@ -3,9 +3,7 @@
 export default function ProjectDetailsSkeleton() {
   return (
     <div className="mx-auto my-30 w-[90%] max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-10 font-inter animate-pulse">
-      {/* LEFT COLUMN */}
       <div className="flex flex-col gap-8">
-        {/* Project Card */}
         <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
           <div className="flex flex-col items-center gap-5">
             <div className="h-8 w-48 bg-white/10 rounded" />
@@ -15,7 +13,6 @@ export default function ProjectDetailsSkeleton() {
           </div>
         </div>
 
-        {/* Contributors */}
         <div className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
           <div className="h-5 w-40 bg-white/10 rounded mb-4" />
           <div className="space-y-3">
@@ -25,7 +22,6 @@ export default function ProjectDetailsSkeleton() {
           </div>
         </div>
 
-        {/* Overview */}
         <div className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
           <div className="h-5 w-32 bg-white/10 rounded mb-3" />
           <div className="h-4 w-40 bg-white/10 rounded mb-4" />
@@ -38,9 +34,7 @@ export default function ProjectDetailsSkeleton() {
         </div>
       </div>
 
-      {/* RIGHT COLUMN */}
       <div className="flex flex-col gap-8">
-        {/* Details */}
         <div className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
           <div className="h-6 w-40 bg-white/10 rounded mb-4" />
           <div className="space-y-3">
@@ -56,7 +50,6 @@ export default function ProjectDetailsSkeleton() {
           </div>
         </div>
 
-        {/* Contact / Actions */}
         <div className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
           <div className="h-5 w-28 bg-white/10 rounded mb-4" />
 

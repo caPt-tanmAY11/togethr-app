@@ -28,7 +28,6 @@ export async function PATCH(req: Request) {
             description,
         } = body;
 
-        /* ---------- Validation (order matters) ---------- */
 
         if (!institution || typeof institution !== "string" || !institution.trim()) {
             return NextResponse.json(
@@ -51,7 +50,6 @@ export async function PATCH(req: Request) {
             );
         }
 
-        /* ---------- Create Education ---------- */
 
         const education = await prisma.education.create({
             data: {

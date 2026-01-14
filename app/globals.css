@@ -146,21 +146,8 @@
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
-  /* dark film overlay */
   z-index: 0;
 }
-
-/* .auth-form-gradient {
-  background: linear-gradient(140deg,
-      #113643 5%,
-      #115457 22%,
-      #33686B 29%,
-      #33686B 30%,
-      #32696C 33%,
-      #224F57 43%,
-      #113643 60%,
-      #0F233B 75%);
-} */
 
 .auth-form-main-btn {
   background: linear-gradient(135deg,
@@ -181,22 +168,22 @@
 
 
 .auth-form-glass-btn {
-  background: rgba(255, 255, 255, 0.082); /* a bit stronger white for visibility */
-  border: 1px solid rgba(255, 255, 255, 0.4); /* more noticeable border */
+  background: rgba(255, 255, 255, 0.082);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.2),
-              0 0 12px rgba(255, 255, 255, 0.2); /* slightly stronger glow */
-  backdrop-filter: blur(12px); /* softer frosted glass */
-  color: white; /* text color */
+    0 0 12px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  color: white;
   font-weight: 500;
   border-radius: 12px;
-  padding: 0.95rem 1.75rem; /* py-4 px-7 equivalent */
+  padding: 0.95rem 1.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .auth-form-glass-btn:hover {
   box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.192),
-              0 0 18px rgba(255, 255, 255, 0.25); /* subtle hover glow */
+    0 0 18px rgba(255, 255, 255, 0.25);
   transform: scale(1.03);
 }
 
@@ -204,13 +191,11 @@
   transform: scale(0.95);
 }
 
-/* globals.css */
 .teal-glow {
   box-shadow:
     0 0 40px rgba(45, 200, 200, 0.25),
     0 0 80px rgba(45, 200, 200, 0.15);
 }
-
 
 
 
@@ -242,6 +227,7 @@
       #50bebe90 80%,
       #25c7c7 100%);
 } */
+
 .bg-main-blurb {
   background-image: linear-gradient(50deg,
       #2b9f9f 20%,

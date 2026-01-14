@@ -14,7 +14,6 @@ export default function TeamSizeSelector() {
             </label>
 
             <div className="relative">
-                {/* Trigger button */}
                 <button
                     type="button"
                     onClick={() => setIsOpen((prev) => !prev)}
@@ -42,7 +41,6 @@ export default function TeamSizeSelector() {
                     </motion.svg>
                 </button>
 
-                {/* Dropdown menu (opens upward) */}
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div

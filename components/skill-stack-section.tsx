@@ -52,7 +52,6 @@ export default function SkillStackSection({
 
   return (
     <>
-      {/* Main skill section */}
       <motion.div
         className="p-4 sm:p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg flex flex-col gap-7"
         initial={{ x: 50, opacity: 0 }}
@@ -92,22 +91,19 @@ export default function SkillStackSection({
         </div>
       </motion.div>
 
-      {/* Modal via Portal */}
       {typeof window !== "undefined" &&
         createPortal(
           <AnimatePresence>
             {isModalOpen && (
               <>
-                {/* Backdrop */}
                 <motion.div
-                  className="fixed inset-0 bg-black/80 backdrop-blur-md z-998"
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-998"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setIsModalOpen(false)}
                 />
 
-                {/* Modal wrapper */}
                 <motion.div
                   className="fixed inset-0 z-999 flex items-center justify-center px-4 sm:px-0"
                   initial={{ scale: 0.9, opacity: 0 }}
@@ -138,7 +134,6 @@ export default function SkillStackSection({
                         : "Add project related tags"}
                     </h2>
 
-                    {/* Input row */}
                     <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="text"
@@ -149,7 +144,7 @@ export default function SkillStackSection({
                         }
                         value={newElement}
                         onChange={(e) => setNewElement(e.target.value)}
-                        className={`flex-1 bg-white/10 px-4 py-2 rounded-md outline-none text-white ${section === "projects" ? "focus:ring-1 focus:ring-[#f36262]" : "focus:ring-1 focus:ring-teal-600"}`}
+                        className={`flex-1 bg-white/10 px-4 py-2 rounded-md outline-none text-white border border-white/15 ${section === "projects" ? "focus:ring-1 focus:ring-[#f36262]" : "focus:ring-1 focus:ring-teal-600"}`}
                       />
                       <button
                         type="button"
@@ -160,7 +155,6 @@ export default function SkillStackSection({
                       </button>
                     </div>
 
-                    {/* Skill list */}
                     <div className="flex flex-wrap gap-2 mt-3 max-h-40 sm:max-h-50 overflow-y-auto">
                       {tempElements.length > 0 ? (
                         tempElements.map((skill, index) => (
@@ -187,7 +181,6 @@ export default function SkillStackSection({
                       )}
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                       <button
                         type="button"

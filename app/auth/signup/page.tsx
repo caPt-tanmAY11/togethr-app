@@ -8,7 +8,6 @@ export default function Signup() {
   return (
     <div className="relative flex justify-center items-center min-h-screen px-4 overflow-hidden">
 
-      {/* Glass container */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -22,22 +21,19 @@ export default function Signup() {
           text-white
         "
       >
-        {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-2xl sm:text-3xl font-poppins font-semibold tracking-wide">
             Create Account
           </h1>
-          <p className="text-sm sm:text-base text-[#8ee8e8c4] mt-2 font-inter">
+          <p className="text-sm sm:text-base text-[#4cd6d6c4] mt-2 font-inter">
             Join us and start collaborating
           </p>
         </div>
 
-        {/* Form */}
         <div className="font-inter">
           <SignupForm />
         </div>
 
-        {/* Footer */}
         <div className="text-gray-400 text-sm text-center font-inter mt-6">
           <p>
             Already have an account?{" "}

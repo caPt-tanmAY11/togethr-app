@@ -32,14 +32,12 @@ export default function ProjectMembers({ members }: Props) {
               px-4 py-3 hover:bg-white/12 cursor-pointer
               transition-colors duration-300 ease-in-out"
           >
-            {/* Avatar */}
             <UserAvatar
               image={member.user.image}
               name={member.user.name}
               className="h-8 w-8"
             />
 
-            {/* Name + Role */}
             <div className="flex-1">
               <p className="font-medium">{member.user.name}</p>
               {member.role === "OWNER" && (
@@ -47,7 +45,6 @@ export default function ProjectMembers({ members }: Props) {
               )}
             </div>
 
-            {/* Chevron */}
             <span className="text-white/40">→</span>
           </div>
         ))}

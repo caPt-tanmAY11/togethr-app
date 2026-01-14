@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import CustomDropdown from "@/components/custom-dropdown";
 import AchievementCategoryDropdown from "@/components/achievement-category-dropdown";
 
 interface AchievementForm {
@@ -20,11 +19,9 @@ export default function OnboardingStep4() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  /* -------------------- Skills -------------------- */
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
 
-  /* -------------------- Achievements -------------------- */
   const [achievements, setAchievements] = useState<AchievementForm[]>([
     { title: "" },
   ]);
@@ -32,7 +29,6 @@ export default function OnboardingStep4() {
   const [selectedProjectStage, setSelectedProjectedStage] =
     useState<string>("");
 
-  /* -------------------- LOAD PREVIOUS DATA -------------------- */
   useEffect(() => {
     async function loadStep4Data() {
       try {
@@ -41,12 +37,10 @@ export default function OnboardingStep4() {
 
         const data = await res.json();
 
-        // Load skills
         if (Array.isArray(data.skills)) {
           setSkills(data.skills);
         }
 
-        // Load achievements
         if (Array.isArray(data.achievements) && data.achievements.length > 0) {
           setAchievements(
             data.achievements.map((ach: AchievementForm) => ({
@@ -58,16 +52,12 @@ export default function OnboardingStep4() {
             }))
           );
         }
-      } catch (err) {
-        // silent fail
-      }
+      } catch (err) {}
     }
 
     loadStep4Data();
   }, []);
-  /* -------------------------------------------------- */
 
-  /* -------------------- Skills Functions -------------------- */
   function addSkill() {
     const value = skillInput.trim();
     if (!value || skills.includes(value)) return;
@@ -79,7 +69,6 @@ export default function OnboardingStep4() {
     setSkills((prev) => prev.filter((s) => s !== skill));
   }
 
-  /* -------------------- Achievements Functions -------------------- */
   function updateAchievement(
     index: number,
     field: keyof AchievementForm,
@@ -98,32 +87,26 @@ export default function OnboardingStep4() {
     setAchievements((prev) => prev.filter((_, i) => i !== index));
   }
 
-  /* -------------------- Submit -------------------- */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // ---------- VALIDATE SKILLS ----------
     if (!skills.length) {
       toast.error("Add at least one skill");
-      return;
-    }
-
-    // ---------- VALIDATE ACHIEVEMENTS ----------
-    const missingAchievement = achievements.find((a) => !a.title?.trim());
-    if (missingAchievement) {
-      toast.error("Achievement title is required");
       return;
     }
 
     setLoading(true);
 
     try {
-      // ---------- CLEAN DATA ----------
       const cleanedAchievements = achievements.filter(
-        (a) => a.title?.trim() !== ""
+        (a) =>
+          a.title?.trim() ||
+          a.description?.trim() ||
+          a.issuer?.trim() ||
+          a.category?.trim() ||
+          a.proofUrl?.trim()
       );
 
-      // ---------- SEND REQUEST ----------
       const res = await fetch("/api/onboarding/step-4-skills-achievements", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -135,9 +118,7 @@ export default function OnboardingStep4() {
 
       if (!res.ok) {
         const data = await res.json();
-        // Show server validation error if exists
-        if (data?.error) toast.error(data.error);
-        else throw new Error();
+        toast.error(data?.error || "Failed to save details");
         return;
       }
 
@@ -152,7 +133,7 @@ export default function OnboardingStep4() {
 
   return (
     <div
-      className="relative flex justify-center items-center min-h-screen
+      className="relative flex justify-center items-center my-auto
     px-3 sm:px-6 lg:px-8 overflow-hidden"
     >
       <motion.div
@@ -168,7 +149,6 @@ export default function OnboardingStep4() {
         text-white
       "
       >
-        {/* STEP INDICATOR */}
         <div className="mb-5 sm:mb-6">
           <div className="flex justify-between gap-4 text-[10px] sm:text-xs text-white/60 tracking-widest">
             <span>STEP 4 OF 4</span>
@@ -180,7 +160,6 @@ export default function OnboardingStep4() {
           </div>
         </div>
 
-        {/* HEADER */}
         <h1 className="text-xl sm:text-2xl font-semibold mb-1">
           Skills & Achievements
         </h1>
@@ -189,11 +168,9 @@ export default function OnboardingStep4() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-7 sm:space-y-8">
-          {/* SKILLS */}
           <div>
             <label className="block text-xs sm:text-sm mb-2">Skills</label>
 
-            {/* SKILL TAGS */}
             <div className="flex flex-wrap gap-2 mb-3">
               {skills.map((skill) => (
                 <span
@@ -218,7 +195,6 @@ export default function OnboardingStep4() {
               ))}
             </div>
 
-            {/* ADD SKILL */}
             <div className="flex gap-2">
               <input
                 value={skillInput}
@@ -255,7 +231,6 @@ export default function OnboardingStep4() {
             </div>
           </div>
 
-          {/* ACHIEVEMENTS */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="text-xs sm:text-sm">Achievements</label>
@@ -293,7 +268,7 @@ export default function OnboardingStep4() {
                   )}
 
                   <input
-                    placeholder="Achievement title *"
+                    placeholder="Achievement title"
                     value={ach.title}
                     onChange={(e) =>
                       updateAchievement(index, "title", e.target.value)
@@ -362,7 +337,6 @@ export default function OnboardingStep4() {
             </AnimatePresence>
           </div>
 
-          {/* ACTIONS */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-4">
             <button
               type="button"
@@ -370,7 +344,7 @@ export default function OnboardingStep4() {
               className="
               w-full sm:w-1/2
               rounded-lg border border-white/20
-              py-2 text-xs sm:text-sm
+              py-2 sm:py-3 text-xs sm:text-sm
               text-white/70 hover:bg-white/5 cursor-pointer
             "
             >
@@ -383,7 +357,7 @@ export default function OnboardingStep4() {
               className="w-full sm:w-1/2
           auth-form-main-btn text-xs sm:text-sm
           rounded-lg
-          py-1.5 sm:py-3
+          py-2 sm:py-3
           font-medium
           disabled:opacity-60 cursor-pointer"
             >

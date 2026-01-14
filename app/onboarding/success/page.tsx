@@ -34,7 +34,7 @@ export default function OnboardingSuccess() {
   }, [router]);
 
   return (
-    <div className="relative flex justify-center items-center min-h-screen px-4 overflow-hidden">
+    <div className="relative flex justify-center items-center px-4 overflow-hidden my-auto">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -61,8 +61,16 @@ export default function OnboardingSuccess() {
 
         <button
           onClick={() => router.push("/main/hacks-teamup")}
-          className="w-full rounded-lg bg-white text-black
-          py-2 text-sm font-medium hover:bg-white/90 transition"
+          // className="w-full rounded-lg bg-white text-black
+          // py-2 text-sm font-medium hover:bg-white/90 transition cursor-pointer"
+
+          className="w-full
+          auth-form-main-btn sm:text-sm
+          rounded-lg
+          py-2 sm:py-3
+          font-medium
+          text-sm
+          disabled:opacity-60 cursor-pointer"
         >
           Go to Main page
         </button>

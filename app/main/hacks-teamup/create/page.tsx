@@ -8,11 +8,9 @@ import { toast } from "sonner";
 import SkillStackSection from "@/components/skill-stack-section";
 import EventDetailsSection from "@/components/event-details-section";
 import TeamSizeDropdown from "@/components/team-size-dropdown";
-import { authClient } from "@/lib/auth-client";
 import { isValidEmail } from "@/lib/utils";
 
 export default function CreateHackTeam() {
-  const { data: session } = authClient.useSession();
   const router = useRouter();
 
   const [teamImage, setTeamImage] = useState<File | null>(null);
@@ -81,11 +79,9 @@ export default function CreateHackTeam() {
 
       const data = await res.json();
 
-      // ---------- HANDLE API VALIDATION ----------
       if (!res.ok || !data.success) {
-        // If API returns which fields are missing
         if (Array.isArray(data.fields) && data.fields.length > 0) {
-          const field = data.fields[0]; // show toast for first missing field only
+          const field = data.fields[0];
           switch (field) {
             case "name":
               toast.error("Team name is required");
@@ -124,7 +120,6 @@ export default function CreateHackTeam() {
               toast.error(data.error || "Missing or invalid field");
           }
         } else {
-          // fallback error
           toast.error(data.error || "Failed to create team");
         }
         return;
@@ -132,7 +127,6 @@ export default function CreateHackTeam() {
 
       const teamId = data.hackTeam.teamId;
 
-      // ---------- UPLOAD IMAGE IF EXISTS ----------
       if (teamImage) {
         const imageFormData = new FormData();
         imageFormData.append("file", teamImage);
@@ -173,9 +167,7 @@ export default function CreateHackTeam() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10">
-          {/* LEFT COLUMN */}
           <div className="flex flex-col gap-10">
-            {/* Team Image */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ x: -60, opacity: 0 }}
@@ -212,7 +204,6 @@ export default function CreateHackTeam() {
               </label>
             </motion.div>
 
-            {/* Team Basic Info */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ y: 50, opacity: 0 }}
@@ -225,19 +216,19 @@ export default function CreateHackTeam() {
                 <input
                   name="team-name"
                   placeholder="Team name *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                 />
 
                 <input
                   name="team-origin-city"
                   placeholder="City *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                 />
 
                 <input
                   name="team-origin-country"
                   placeholder="Country *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                 />
 
                 <TeamSizeDropdown
@@ -251,15 +242,13 @@ export default function CreateHackTeam() {
                   name="team-desc"
                   rows={5}
                   placeholder="Describe your team and goals..."
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-teal-600"
+                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                 />
               </div>
             </motion.div>
           </div>
 
-          {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-10">
-            {/* Event Details */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ y: -40, opacity: 0 }}
@@ -272,7 +261,6 @@ export default function CreateHackTeam() {
               />
             </motion.div>
 
-            {/* Skills */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ x: 50, opacity: 0 }}
@@ -287,7 +275,6 @@ export default function CreateHackTeam() {
               />
             </motion.div>
 
-            {/* Contact */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 md:max-w-3/4 border border-white/10 backdrop-blur-xl"
               initial={{ x: 50, opacity: 0 }}
@@ -300,13 +287,13 @@ export default function CreateHackTeam() {
                 <input
                   name="phone-no"
                   placeholder="Phone number"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                 />
 
                 <input
                   name="email"
                   placeholder="Email address *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                 />
               </div>
 

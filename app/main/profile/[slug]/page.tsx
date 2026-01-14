@@ -17,7 +17,6 @@ import AddAchievementModal, {
   AchievementInput,
 } from "@/components/add-achievement-modal";
 
-/* -------------------- Types -------------------- */
 interface ProfileData {
   id: string;
   name: string;
@@ -71,13 +70,11 @@ interface ConnectionUser {
   headline: string | null;
 }
 
-/* -------------------- UI Constants -------------------- */
 const cardBase =
   "relative z-10 w-full rounded-2xl border border-white/10 " +
   "bg-linear-to-br from-white/10 via-white/5 to-transparent " +
   "backdrop-blur-2xl p-8 sm:p-10 text-white";
 
-/* -------------------- Component -------------------- */
 export default function ProfilePage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
@@ -123,13 +120,11 @@ export default function ProfilePage() {
 
       const result = await res.json();
 
-      // ❗ Handle server-side validation errors
       if (!res.ok) {
         toast.error(result?.error || "Failed to add education");
         return;
       }
 
-      // ✅ Success
       setProfile((prev) => {
         if (!prev) return prev;
 
@@ -170,7 +165,7 @@ export default function ProfilePage() {
 
         return {
           ...prev,
-          achievements: [result.achievement, ...prev.achievements], // prepend
+          achievements: [result.achievement, ...prev.achievements],
         };
       });
 
@@ -183,7 +178,6 @@ export default function ProfilePage() {
     }
   };
 
-  /* -------------------- Fetch Profile -------------------- */
   useEffect(() => {
     const controller = new AbortController();
 
@@ -252,7 +246,6 @@ export default function ProfilePage() {
         }),
       });
 
-      // Optimistic update
       setIsFollowing(true);
       setProfile((prev) =>
         prev
@@ -283,7 +276,6 @@ export default function ProfilePage() {
         }),
       });
 
-      // Optimistic update
       setIsFollowing(false);
       setProfile((prev) =>
         prev
@@ -354,7 +346,6 @@ export default function ProfilePage() {
     }
   };
 
-  /* -------------------- States -------------------- */
   if (!isReady) {
     return <ProfilePageSkeleton />;
   }
@@ -371,7 +362,6 @@ export default function ProfilePage() {
     );
   }
 
-  /* -------------------- UI -------------------- */
   return (
     <>
       <motion.div
@@ -395,9 +385,7 @@ export default function ProfilePage() {
             </button>
           )}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
-            {/* ---------------- LEFT (2/5) ---------------- */}
             <div className="lg:col-span-2 grid gap-6">
-              {/* PROFILE CARD */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -412,7 +400,6 @@ export default function ProfilePage() {
                       className="h-32 w-32 xs:h-36 xs:w-36 sm:h-44 sm:w-44 md:h-52 md:w-52"
                     />
 
-                    {/* EDIT BUTTON */}
                     {isOwner && (
                       <button
                         onClick={() => setShowImageMenu((p) => !p)}
@@ -426,7 +413,6 @@ export default function ProfilePage() {
                       </button>
                     )}
 
-                    {/* DROPDOWN */}
                     <AnimatePresence>
                       {showImageMenu && (
                         <motion.div
@@ -434,13 +420,13 @@ export default function ProfilePage() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
                           className="absolute right-0 mt-2 w-40 
-            rounded-xl bg-black/90 border border-white/10
+            rounded-xl bg-black border border-white/10
             backdrop-blur-md overflow-hidden z-50"
                         >
                           <button
                             onClick={() => fileInputRef.current?.click()}
                             className="w-full px-4 py-3 text-sm text-left
-              hover:bg-white/10 flex items-center gap-2"
+              hover:bg-white/10 flex items-center gap-2 cursor-pointer"
                           >
                             <Upload size={14} />
                             Update photo
@@ -449,7 +435,7 @@ export default function ProfilePage() {
                           <button
                             onClick={handleRemoveImage}
                             className="w-full px-4 py-3 text-sm text-left
-              hover:bg-red-500/10 text-red-400 flex items-center gap-2"
+              hover:bg-red-500/10 text-red-400 flex items-center gap-2 cursor-pointer"
                           >
                             <Trash size={14} />
                             Remove photo
@@ -467,19 +453,16 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  {/* NAME */}
                   <h1 className="mt-4 sm:mt-6 text-xl xs:text-2xl sm:text-3xl font-bold">
                     {profile.name}
                   </h1>
 
-                  {/* HEADLINE */}
                   {profile.headline && (
                     <p className="text-sm sm:text-base md:text-lg text-white/80 max-w-md">
                       {profile.headline}
                     </p>
                   )}
 
-                  {/* TRUST POINTS */}
                   <div className="mt-1 flex items-center gap-2 text-xs sm:text-sm">
                     <span
                       className="rounded-full bg-teal-500/10 border border-teal-400/30 
@@ -489,7 +472,6 @@ export default function ProfilePage() {
                     </span>
                   </div>
 
-                  {/* FOLLOW STATS */}
                   <div className="flex gap-3 xs:gap-6">
                     <button
                       onClick={() => openConnections("FOLLOWERS")}
@@ -512,7 +494,6 @@ export default function ProfilePage() {
                     </button>
                   </div>
 
-                  {/* LOCATION */}
                   {(profile.locationCity || profile.locationCountry) && (
                     <p className="text-xs sm:text-sm text-white/60">
                       {profile.locationCity}
@@ -521,7 +502,6 @@ export default function ProfilePage() {
                     </p>
                   )}
 
-                  {/* FOLLOW BUTTON */}
                   {!isOwner && (
                     <button
                       onClick={isFollowing ? handleUnfollow : handleFollow}
@@ -547,7 +527,6 @@ export default function ProfilePage() {
                 </div>
               </motion.div>
 
-              {/* CONTACT / LINKS */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -575,7 +554,6 @@ export default function ProfilePage() {
                     </p>
                   </div>
 
-                  {/* SOCIAL LINKS */}
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">
                       Socials
@@ -640,9 +618,7 @@ export default function ProfilePage() {
               </motion.div>
             </div>
 
-            {/* ---------------- RIGHT (3/5) ---------------- */}
             <div className="lg:col-span-3 relative grid gap-6">
-              {/* ABOUT + SKILLS */}
               <motion.div className={cardBase}>
                 <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">
                   About
@@ -675,9 +651,7 @@ export default function ProfilePage() {
                 </div>
               </motion.div>
 
-              {/* EDUCATION */}
               <motion.div className={cardBase}>
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-7">
                   <h2 className="text-base sm:text-lg font-semibold">
                     Education
@@ -696,7 +670,6 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Content */}
                 {profile.education.length === 0 ? (
                   <p className="text-sm text-white/50">No education added</p>
                 ) : (
@@ -737,9 +710,7 @@ export default function ProfilePage() {
                 )}
               </motion.div>
 
-              {/* ACHIEVEMENTS */}
               <motion.div className={cardBase}>
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-7">
                   <h2 className="text-base sm:text-lg font-semibold">
                     Achievements
@@ -759,7 +730,6 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Content */}
                 {profile.achievements.length === 0 ? (
                   <p className="text-sm text-white/50">No achievements added</p>
                 ) : (
@@ -770,7 +740,6 @@ export default function ProfilePage() {
                         className="rounded-xl border border-white/10
           bg-white/5 p-3 sm:p-4"
                       >
-                        {/* Title row */}
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                           <h3 className="text-sm sm:text-base font-semibold break-words">
                             {ach.title}

@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import ProfileSettingsSkeleton from "@/components/skeletons/profile-settings-skeleton";
 
-/* -------------------- Types -------------------- */
 interface ProfileResponse {
   name: string;
   headline: string | null;
@@ -44,7 +43,6 @@ interface ProfileResponse {
   }[];
 }
 
-/* -------------------- Component -------------------- */
 export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -54,7 +52,6 @@ export default function SettingsPage() {
 
   const [hasPassword, setHasPassword] = useState(false);
 
-  /* ---------- Profile ---------- */
   const [name, setName] = useState("");
   const [headline, setHeadline] = useState("");
   const [organization, setOrganization] = useState("");
@@ -62,22 +59,18 @@ export default function SettingsPage() {
   const [locationCountry, setLocationCountry] = useState("");
   const [about, setAbout] = useState("");
 
-  /* ---------- Links ---------- */
   const [linkedinUrl, setLinkedInUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [XUrl, setXUrl] = useState("");
 
-  /* ---------- Skills ---------- */
   const [skills, setSkills] = useState<string[]>([]);
 
-  /* ---------- Education & Achievements ---------- */
   const [education, setEducation] = useState<ProfileResponse["education"]>([]);
   const [achievements, setAchievements] = useState<
     ProfileResponse["achievements"]
   >([]);
 
-  /* ---------- Fetch Existing Profile ---------- */
   useEffect(() => {
     async function fetchProfile() {
       try {
@@ -118,7 +111,6 @@ export default function SettingsPage() {
     fetchProfile();
   }, []);
 
-  /* ---------- Submit ---------- */
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -167,14 +159,12 @@ export default function SettingsPage() {
   if (initialLoading) {
     return <ProfileSettingsSkeleton />;
   }
-  /* -------------------- UI -------------------- */
   return (
     <>
       <form
         onSubmit={handleUpdate}
         className="mx-auto max-w-3xl space-y-10 text-white my-20"
       >
-        {/* PROFILE */}
         <Section title="Profile">
           <div className="space-y-4 sm:space-y-5">
             <Input label="Name" value={name} onChange={setName} />
@@ -205,7 +195,6 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        {/* LINKS */}
         <Section title="Social Links">
           <div className="space-y-4 sm:space-y-5">
             <Input
@@ -226,7 +215,6 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        {/* SKILLS */}
         <Section title="Skills">
           <SkillStackSection
             section="hack-teams"
@@ -273,7 +261,6 @@ export default function SettingsPage() {
                   }}
                 />
 
-                {/* YEARS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Start Year"
@@ -388,7 +375,6 @@ export default function SettingsPage() {
           {loading ? "Saving..." : "Save Changes"}
         </button>
 
-        {/* SECURITY */}
         <Section title="Security">
           <div
             className="flex flex-col sm:flex-row
@@ -400,7 +386,7 @@ export default function SettingsPage() {
                 {hasPassword ? "Password" : "Set up a password"}
               </p>
 
-              <p className="text-xs text-white/60 max-w-md">
+              <p className="text-sm text-white/60 max-w-md">
                 {hasPassword
                   ? "Change your account password to keep your account secure."
                   : "You signed up using OAuth. Set a password to enable email & password login."}
@@ -442,7 +428,6 @@ export default function SettingsPage() {
   );
 }
 
-/* -------------------- Reusable UI -------------------- */
 
 function Section({
   title,
@@ -474,7 +459,7 @@ function Input({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/10 px-3 py-2 rounded-md outline-none text-white focus:ring-2 focus:ring-teal-400"
+        className="w-full bg-white/10 px-3 py-2 rounded-md outline-none text-white focus:ring-1 focus:ring-teal-600 border border-white/15"
       />
     </div>
   );
@@ -496,7 +481,7 @@ function Textarea({
         rows={5}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/10 px-3 py-2 rounded-md outline-none text-white focus:ring-2 focus:ring-teal-400 resize-none"
+        className="w-full bg-white/10 px-3 py-2 rounded-md outline-none text-white border border-white/15 focus:ring-1 focus:ring-teal-600 resize-none"
       />
     </div>
   );

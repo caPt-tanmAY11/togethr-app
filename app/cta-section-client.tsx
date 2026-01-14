@@ -11,7 +11,7 @@ export default function CTASectionClient() {
       id="contact"
       className="pb-16 sm:pb-24 md:pb-32 flex flex-col gap-10 items-center text-center px-4 sm:px-6 md:px-12 my-20"
     >
-      <h2 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
+      <h2 className="text-2xl font-poppins sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
         Ready to build togethr?
       </h2>
 

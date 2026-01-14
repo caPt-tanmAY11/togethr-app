@@ -1,22 +1,28 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-// import { requireAdmin } from "@/lib/admin-auth"; // optional admin check
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function GET(request: Request) {
     try {
-        // 🔐 OPTIONAL: Admin authentication
-        // await requireAdmin();
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
 
-        // Extract query params for pagination
+        if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const { searchParams } = new URL(request.url);
-        const page = parseInt(searchParams.get("page") || "1"); // default page 1
-        const limit = parseInt(searchParams.get("limit") || "20"); // default 20 per page
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "20");
         const skip = (page - 1) * limit;
 
-        // Optional: search by name or email
         const search = searchParams.get("search") || "";
 
-        // Fetch users with pagination and optional search
         const [users, totalUsers] = await Promise.all([
             prisma.user.findMany({
                 where: {

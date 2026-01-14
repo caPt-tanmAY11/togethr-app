@@ -23,9 +23,7 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   return (
     <>
-      {/* Content */}
       <div className="flex flex-col gap-5 p-6 pb-16">
-        {/* Header */}
         <div className="flex flex-col gap-3 font-inter">
           <h1 className="text-xl font-semibold text-white/90 tracking-wide wrap-break-word">
             {title}
@@ -37,7 +35,6 @@ export default function ProjectCard({
           </p>
         </div>
 
-        {/* Description Box */}
         <div className="bg-white/5 flex flex-col gap-3 py-4 px-4 rounded-lg border border-white/10 shadow-inner">
           <p className="text-sm text-[#a1a1a1] leading-relaxed wrap-break-word">{shortDesc}</p>
 
@@ -68,7 +65,6 @@ export default function ProjectCard({
           </div>
         </div>
 
-        {/* Footer Info */}
         <div className="font-inter text-sm px-1">
           <p>
             Contributors:{" "}
@@ -96,7 +92,6 @@ export default function ProjectCard({
         </div>
       </div>
 
-      {/* CTA */}
       <div className="absolute bottom-4 right-4 sm:bottom-5 sm:right-5">
         <Link
           href={`/main/projects/${projectId}`}

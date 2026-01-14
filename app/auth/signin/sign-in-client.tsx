@@ -31,7 +31,7 @@ export default function SigninClient() {
           <h1 className="text-2xl sm:text-3xl font-poppins font-semibold tracking-wide">
             Welcome Back
           </h1>
-          <p className="text-sm sm:text-base text-[#8ee8e8c4] mt-2 font-inter">
+          <p className="text-sm sm:text-base text-[#4cd6d6c4] mt-2 font-inter">
             Enter your credentials to sign in
           </p>
         </div>

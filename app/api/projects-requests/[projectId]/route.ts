@@ -94,8 +94,6 @@ export async function POST(
             },
         });
 
-        console.log(project.contactEmail)
-
         await sendEmail({
             to: project.contactEmail,
             subject: "New collaboration request for your project",

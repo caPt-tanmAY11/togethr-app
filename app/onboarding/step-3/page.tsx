@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import OnboardingStep3Skeleton from "@/components/skeletons/onboarding-step3";
 
 interface EducationForm {
   institution: string;
@@ -19,12 +20,12 @@ interface EducationForm {
 export default function OnboardingStep3() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [hydrating, setHydrating] = useState(true);
 
   const [education, setEducation] = useState<EducationForm[]>([
     { institution: "" },
   ]);
 
-  /* -------------------- LOAD PREVIOUS DATA -------------------- */
   useEffect(() => {
     async function loadEducation() {
       try {
@@ -47,7 +48,8 @@ export default function OnboardingStep3() {
           );
         }
       } catch {
-        // silent fail (no UX disruption)
+      } finally {
+        setHydrating(false);
       }
     }
 
@@ -75,7 +77,6 @@ export default function OnboardingStep3() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     setLoading(true);
 
     try {
@@ -87,43 +88,37 @@ export default function OnboardingStep3() {
 
       const data = await res.json();
 
-      /* ---------- Auth ---------- */
       if (res.status === 401) {
         toast.error("Session expired. Please log in again.");
         router.push("/login");
         return;
       }
 
-      /* ---------- Validation ---------- */
-      if (res.status === 400) {
-        if (data?.field === "institution") {
-          toast.error("Institution is required");
-        } else {
-          toast.error(data?.error || "Invalid education data");
-        }
-        return;
-      }
-
-      /* ---------- Other errors ---------- */
       if (!res.ok) {
         toast.error(data?.error || "Failed to save education");
         return;
       }
 
-      /* ---------- Success ---------- */
       toast.success("Step 3 completed");
       router.push("/onboarding/step-4");
-    } catch {
+    } catch (error) {
       toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
+  if (hydrating) {
+    return <OnboardingStep3Skeleton />;
+  }
+
   return (
     <div
-      className="relative flex justify-center items-center min-h-screen
-    px-3 sm:px-6 lg:px-8 overflow-hidden"
+      className="relative flex justify-center items-center
+    px-3 sm:px-6 lg:px-8 overflow-hidden w-[95vw] my-auto
+      max-w-md
+      sm:max-w-lg
+      lg:max-w-xl"
     >
       <motion.div
         initial={{ y: 24, opacity: 0 }}
@@ -138,7 +133,6 @@ export default function OnboardingStep3() {
         text-white
       "
       >
-        {/* STEP INDICATOR */}
         <div className="mb-5 sm:mb-6">
           <div className="flex items-center justify-between gap-4">
             <span className="text-[10px] sm:text-xs tracking-widest text-white/60">
@@ -154,7 +148,6 @@ export default function OnboardingStep3() {
           </div>
         </div>
 
-        {/* HEADER */}
         <div className="mb-5 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-semibold">Education</h1>
           <p className="text-xs sm:text-sm text-white/60 mt-1">
@@ -162,7 +155,6 @@ export default function OnboardingStep3() {
           </p>
         </div>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           <AnimatePresence>
             {education.map((edu, index) => (
@@ -177,7 +169,6 @@ export default function OnboardingStep3() {
                 space-y-4 bg-white/5
               "
               >
-                {/* REMOVE */}
                 {education.length > 1 && (
                   <button
                     type="button"
@@ -191,25 +182,24 @@ export default function OnboardingStep3() {
                   </button>
                 )}
 
-                {/* Institution */}
                 <div>
                   <input
                     value={edu.institution}
                     onChange={(e) =>
                       updateField(index, "institution", e.target.value)
                     }
-                    placeholder="University / College / School *"
+                    placeholder="University / College / School"
                     className="
                     w-full rounded-lg bg-white/5 border border-white/10
-                    px-3 sm:px-4 py-2
+                    px-2 sm:px-3 py-1.5
+                    sm:py-2.5
                     text-xs sm:text-sm
                     outline-none focus:border-white/30
                   "
                   />
                 </div>
 
-                {/* Degree | Field | Grade */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                   <input
                     placeholder="Degree (B.Tech, BSc, etc.)"
                     value={edu.degree || ""}
@@ -218,7 +208,8 @@ export default function OnboardingStep3() {
                     }
                     className="
                     rounded-lg bg-white/5 border border-white/10
-                    px-3 sm:px-4 py-2
+                   px-2 sm:px-3 py-1.5
+            sm:py-2.5
                     text-xs sm:text-sm
                     outline-none focus:border-white/30
                   "
@@ -232,7 +223,8 @@ export default function OnboardingStep3() {
                     }
                     className="
                     rounded-lg bg-white/5 border border-white/10
-                    px-3 sm:px-4 py-2
+                    px-2 sm:px-3 py-1.5
+            sm:py-2.5
                     text-xs sm:text-sm
                     outline-none focus:border-white/30
                   "
@@ -246,15 +238,15 @@ export default function OnboardingStep3() {
                     }
                     className="
                     rounded-lg bg-white/5 border border-white/10
-                    px-3 sm:px-4 py-2
+                    px-2 sm:px-3 py-1.5
+            sm:py-2.5
                     text-xs sm:text-sm
                     outline-none focus:border-white/30
                   "
                   />
                 </div>
 
-                {/* Years */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
                   <input
                     placeholder="Start year"
                     value={edu.startYear || ""}
@@ -263,7 +255,8 @@ export default function OnboardingStep3() {
                     }
                     className="
                     rounded-lg bg-white/5 border border-white/10
-                    px-3 sm:px-4 py-2
+                    px-2 sm:px-3 py-1.5
+            sm:py-2.5
                     text-xs sm:text-sm
                     outline-none focus:border-white/30
                   "
@@ -277,16 +270,16 @@ export default function OnboardingStep3() {
                     }
                     className="
                     rounded-lg bg-white/5 border border-white/10
-                    px-3 sm:px-4 py-2
+                    px-2 sm:px-3 py-1.5
+            sm:py-2.5
                     text-xs sm:text-sm
                     outline-none focus:border-white/30
                   "
                   />
                 </div>
 
-                {/* Description */}
                 <textarea
-                  placeholder="Description (optional)"
+                  placeholder="Description"
                   value={edu.description || ""}
                   onChange={(e) =>
                     updateField(index, "description", e.target.value)
@@ -294,7 +287,8 @@ export default function OnboardingStep3() {
                   rows={3}
                   className="
                   w-full rounded-lg bg-white/5 border border-white/10
-                  px-3 sm:px-4 py-2
+                  px-2 sm:px-3 py-1.5
+            sm:py-2.5
                   text-xs sm:text-sm
                   outline-none resize-none focus:border-white/30
                 "
@@ -303,7 +297,6 @@ export default function OnboardingStep3() {
             ))}
           </AnimatePresence>
 
-          {/* ADD BUTTON */}
           <button
             type="button"
             onClick={addEducation}
@@ -316,7 +309,6 @@ export default function OnboardingStep3() {
             <Plus size={16} /> Add another education
           </button>
 
-          {/* ACTIONS */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-4">
             <button
               type="button"
@@ -324,7 +316,7 @@ export default function OnboardingStep3() {
               className="
               w-full sm:w-1/2
               rounded-lg border border-white/20
-              py-2 text-xs sm:text-sm
+              py-2 sm:py-3 text-xs sm:text-sm
               text-white/70 hover:bg-white/5 transition cursor-pointer
             "
             >
@@ -337,7 +329,7 @@ export default function OnboardingStep3() {
               className="w-full sm:w-1/2
           auth-form-main-btn text-xs sm:text-sm
           rounded-lg
-          py-1.5 sm:py-3
+          py-2 sm:py-3
           font-medium
           disabled:opacity-60 cursor-pointer"
             >

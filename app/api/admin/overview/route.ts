@@ -5,16 +5,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // const session = await auth.api.getSession({
-    //   headers: await headers()
-    // });
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
 
-    // if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
-    //   return NextResponse.json(
-    //     { error: "Unauthorized" },
-    //     { status: 401 }
-    //   );
-    // }
+    if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     const [
       totalUsers,
@@ -42,7 +42,6 @@ export async function GET() {
       pendingHackRequests,
       pendingProjectRequests,
     ] = await Promise.all([
-      // ---------------- USERS ----------------
       prisma.user.count(),
 
       prisma.user.count({
@@ -61,7 +60,6 @@ export async function GET() {
         },
       }),
 
-      // ---------------- HACK TEAMS ----------------
       prisma.hackTeam.count(),
 
       prisma.hackTeam.count({
@@ -78,7 +76,6 @@ export async function GET() {
 
       prisma.hackTeamMember.count(),
 
-      // ---------------- PROJECTS ----------------
       prisma.project.count(),
 
       prisma.project.count({
@@ -95,7 +92,6 @@ export async function GET() {
 
       prisma.projectMember.count(),
 
-      // ---------------- FEEDBACK ----------------
       prisma.feedback.count(),
 
       prisma.feedback.aggregate({
@@ -104,10 +100,8 @@ export async function GET() {
         },
       }),
 
-      // ---------------- CONTACT QUERIES ----------------
       prisma.contactMessage.count(),
 
-      // ---------------- REQUESTS ----------------
       prisma.request.count({
         where: { status: "PENDING" },
       }),

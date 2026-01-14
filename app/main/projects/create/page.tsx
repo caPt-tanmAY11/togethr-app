@@ -64,14 +64,12 @@ export default function CreateProjectPage() {
 
       const data = await res.json();
 
-      // ---------------- HANDLE VALIDATION ERRORS ----------------
       if (!res.ok || !data.success) {
         if (
           data.fields &&
           Array.isArray(data.fields) &&
           data.fields.length > 0
         ) {
-          // Show toast for the first missing field
           const field = data.fields[0];
           let msg = "";
 
@@ -135,7 +133,6 @@ export default function CreateProjectPage() {
   return (
     <form onSubmit={handleCreateProjectFormSubmit}>
       <div className="mx-auto mt-28 mb-40 w-[92%] max-w-7xl font-inter text-white">
-        {/* ---------------- PAGE HEADER ---------------- */}
         <motion.div
           className="mb-14 text-center"
           // initial={{ y: -30, opacity: 0 }}
@@ -150,11 +147,8 @@ export default function CreateProjectPage() {
           </p>
         </motion.div>
 
-        {/* ---------------- MAIN CONTENT ---------------- */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-10">
-          {/* ================= LEFT COLUMN ================= */}
           <div className="flex flex-col gap-10">
-            {/* Project Basics */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ y: -50, opacity: 0 }}
@@ -167,13 +161,13 @@ export default function CreateProjectPage() {
                 <input
                   name="project-name"
                   placeholder="Project name *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
 
                 <input
                   name="project-github-url"
                   placeholder="GitHub repository"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
 
                 <textarea
@@ -181,7 +175,7 @@ export default function CreateProjectPage() {
                   rows={3}
                   maxLength={220}
                   placeholder="Short description (what & why) *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
 
                 <textarea
@@ -189,12 +183,11 @@ export default function CreateProjectPage() {
                   rows={5}
                   maxLength={2500}
                   placeholder="Detailed description (problem, solution, scope) *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
               </div>
             </motion.div>
 
-            {/* Project Metadata */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ x: -50, opacity: 0 }}
@@ -232,9 +225,7 @@ export default function CreateProjectPage() {
             </motion.div>
           </div>
 
-          {/* ================= RIGHT COLUMN ================= */}
           <div className="flex flex-col gap-10">
-            {/* Skills & Collaboration */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ x: 50, opacity: 0 }}
@@ -256,11 +247,10 @@ export default function CreateProjectPage() {
                 rows={3}
                 name="extra-note"
                 placeholder="What kind of collaborators are you looking for?"
-                className="mt-4 w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262]"
+                className="mt-4 w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
               />
             </motion.div>
 
-            {/* Owner & Contact */}
             <motion.div
               className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl"
               initial={{ y: 50, opacity: 0 }}
@@ -273,19 +263,19 @@ export default function CreateProjectPage() {
                 <input
                   name="linkedin"
                   placeholder="LinkedIn profile URL *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
 
                 <input
                   name="phone"
                   placeholder="Phone number"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
 
                 <input
                   name="email"
                   placeholder="Contact email *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262]"
+                  className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
               </div>
 

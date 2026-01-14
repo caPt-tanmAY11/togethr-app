@@ -40,9 +40,8 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
 
     return (
         <>
-            {/* Main section */}
             <motion.div
-                className="p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg flex flex-col gap-6"
+                className="p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex flex-col gap-6"
                 initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8 }}
@@ -114,22 +113,19 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
             </motion.div>
 
 
-            {/* Modal using React Portal */}
             {typeof window !== "undefined" &&
                 createPortal(
                     <AnimatePresence>
                         {isModalOpen && (
                             <>
-                                {/* Fullscreen backdrop */}
                                 <motion.div
-                                    className="fixed top-0 left-0 w-screen h-screen bg-black/80 backdrop-blur-sm z-[1000]"
+                                    className="fixed top-0 left-0 w-screen h-screen bg-black/60 backdrop-blur-sm z-[1000]"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     onClick={() => setIsModalOpen(false)}
                                 />
 
-                                {/* Centered modal */}
                                 <motion.div
                                     className="fixed inset-0 z-[1001] flex justify-center items-center"
                                     initial={{ scale: 0.8, opacity: 0 }}
@@ -150,7 +146,7 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
                                                     name="name"
                                                     value={tempDetails.name}
                                                     onChange={handleChange}
-                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600"
+                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1">
@@ -160,7 +156,7 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
                                                     rows={3}
                                                     value={tempDetails.description}
                                                     onChange={handleChange}
-                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600 resize-none"
+                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600 resize-none border border-white/15"
                                                 />
                                             </div>
 
@@ -194,7 +190,7 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
                                                     name="link"
                                                     value={tempDetails.link}
                                                     onChange={handleChange}
-                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600"
+                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1">
@@ -204,7 +200,7 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
                                                     name="location"
                                                     value={tempDetails.location}
                                                     onChange={handleChange}
-                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600"
+                                                    className="bg-white/10 px-3 py-2 rounded-md outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
                                                 />
                                             </div>
                                         </div>

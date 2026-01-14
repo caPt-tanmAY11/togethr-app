@@ -12,7 +12,6 @@ import {
   Mail,
 } from "lucide-react";
 
-// Reusable stat card
 function StatCard({
   title,
   value,
@@ -35,7 +34,6 @@ function StatCard({
   );
 }
 
-// Small badge for status
 function Badge({ text, color }: { text: string; color: string }) {
   return (
     <span
@@ -72,7 +70,6 @@ export default function AdminOverview() {
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Admin Overview</h1>
 
-      {/* Top Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <StatCard
           title="Total Users"
@@ -100,7 +97,6 @@ export default function AdminOverview() {
         />
       </div>
 
-      {/* User & Engagement Stats */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-3">
           <h2 className="text-lg font-semibold">User Insights</h2>
@@ -131,7 +127,6 @@ export default function AdminOverview() {
         </div>
       </div>
 
-      {/* Hack Teams Stats */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-3">
           <h2 className="text-lg font-semibold">Hack Teams Overview</h2>
@@ -157,7 +152,6 @@ export default function AdminOverview() {
           </div>
         </div>
 
-        {/* Projects Stats */}
         <div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-3">
           <h2 className="text-lg font-semibold">Projects Overview</h2>
           <div className="flex justify-between items-center">
@@ -183,7 +177,6 @@ export default function AdminOverview() {
         </div>
       </div>
 
-      {/* Feedback & Contact Queries */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-3">
           <h2 className="text-lg font-semibold">Engagement</h2>

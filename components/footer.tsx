@@ -1,15 +1,11 @@
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden">
-      {/* Top glow */}
       <div className="absolute inset-x-0 -top-24 h-40 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
-      {/* Glass background */}
       <div className="relative backdrop-blur-2xl bg-black/95 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-14">
-          {/* Main grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-white/80">
-            {/* Brand */}
             <div>
               <h2 className="text-2xl font-semibold text-white tracking-wide">
                 togethr<span className="text-white/60">.</span>
@@ -21,7 +17,6 @@ export default function Footer() {
               </p>
             </div>
 
-            {/* Links */}
             <div>
               <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">
                 Explore
@@ -48,7 +43,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Social / Meta */}
             <div>
               <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">
                 Connect
@@ -82,7 +76,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Bottom bar */}
           <div
             className="mt-14 pt-6 border-t border-white/10
             flex flex-col sm:flex-row items-center justify-between

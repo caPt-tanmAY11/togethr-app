@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-// import { requireAdmin } from "@/lib/admin-auth"; // optional
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function GET(request: Request) {
     try {
-        // 🔐 OPTIONAL: Admin auth
-        // await requireAdmin();
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
+
+        if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
 
         const { searchParams } = new URL(request.url);
 
@@ -13,13 +22,12 @@ export async function GET(request: Request) {
         const limit = parseInt(searchParams.get("limit") || "20");
         const skip = (page - 1) * limit;
 
-        // Optional filters
-        const status = searchParams.get("status"); // PENDING | ACCEPTED | REJECTED | CANCELLED
-        const type = searchParams.get("type"); // JOIN | INVITE
-        const teamId = searchParams.get("teamId"); // specific hack team
+        const status = searchParams.get("status");
+        const type = searchParams.get("type");
+        const teamId = searchParams.get("teamId");
 
         const where: any = {
-            hackTeamId: { not: null }, // ensure hack-team requests only
+            hackTeamId: { not: null },
         };
 
         if (status) where.status = status;

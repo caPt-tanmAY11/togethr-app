@@ -28,7 +28,6 @@ export default function AchievementCategoryDropdown({
 
   return (
     <div className="relative">
-      {/* Trigger */}
       <button
         type="button"
         onClick={() => setIsOpen((p) => !p)}
@@ -62,7 +61,6 @@ export default function AchievementCategoryDropdown({
         </motion.svg>
       </button>
 
-      {/* Dropdown */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
