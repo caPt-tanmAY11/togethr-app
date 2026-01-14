@@ -254,7 +254,7 @@ export default function ProjectDetailsPage() {
     try {
       setActionLoading(true);
 
-      const res = await fetch(`/api/project/${project?.id}/complete`, {
+      const res = await fetch(`/api/projects/${project?.id}/complete`, {
         method: "PATCH",
       });
 
