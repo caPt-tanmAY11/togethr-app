@@ -157,7 +157,7 @@ export default function Navbar() {
           })}
         </div>
 
-        <div className="hidden md:flex items-center gap-4 relative">
+        <div className="hidden lg:flex items-center gap-4 relative">
           {createConfig && (
             <Link
               href={createConfig.href}
@@ -265,7 +265,7 @@ export default function Navbar() {
         </div>
         <button
           onClick={() => setMobileMenuOpen((p) => !p)}
-          className="md:hidden text-white p-2 rounded-lg hover:bg-white/10"
+          className="lg:hidden text-white p-2 rounded-lg hover:bg-white/10"
         >
           {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -323,7 +323,7 @@ export default function Navbar() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "-100%", opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="fixed inset-0 z-[999] md:hidden
+            className="fixed inset-0 z-[999] lg:hidden
       bg-gradient-to-b from-black/95 to-black/90
       backdrop-blur-2xl"
           >

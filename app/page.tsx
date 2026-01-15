@@ -137,7 +137,7 @@ export default function Home() {
           flex flex-col
         "
                 >
-                  <div className="flex flex-col sm:flex-row gap-4 h-full">
+                  <div className="flex flex-col xl:flex-row gap-4 h-full">
                     <div className="shrink-0">
                       <Image
                         src={feature.svg}
