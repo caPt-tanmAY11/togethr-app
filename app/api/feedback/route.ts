@@ -8,13 +8,6 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { message, rating } = body;
 
-        if (!message || message.trim().length < 5) {
-            return NextResponse.json(
-                { success: false, error: "Invalid feedback data" },
-                { status: 400 }
-            );
-        }
-
         if (rating && (rating < 1 || rating > 5)) {
             return NextResponse.json(
                 { success: false, error: "Invalid rating" },

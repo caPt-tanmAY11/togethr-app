@@ -29,11 +29,6 @@ export default function FeedbackModal() {
   async function handleFeedbackSubmit() {
     if (rating === 0) return;
 
-    if (!message.trim()) {
-      toast.error("Please write some feedback before submitting.");
-      return;
-    }
-
     try {
       setIsSubmitting(true);
 
@@ -157,7 +152,7 @@ export default function FeedbackModal() {
 
                     <button
                       disabled={
-                        rating === 0 || isSubmitting || message.length === 0
+                        rating === 0 || isSubmitting
                       }
                       onClick={handleFeedbackSubmit}
                       className={`px-4 py-2 rounded-lg

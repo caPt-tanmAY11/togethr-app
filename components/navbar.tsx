@@ -89,7 +89,7 @@ export default function Navbar() {
         flex items-center justify-between px-6 sm:px-10 font-inter"
       >
         <Link
-          href="/main/hacks-teamup"
+          href="/"
           className="text-white font-bold text-xl flex items-center gap-1"
         >
           togethr
