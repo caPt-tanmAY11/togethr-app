@@ -89,7 +89,6 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Users</h1>
         <p className="text-white/60 mt-1">
@@ -97,7 +96,6 @@ export default function UsersPage() {
         </p>
       </div>
 
-      {/* Search */}
       <form onSubmit={handleSearch} className="flex gap-3 max-w-md">
         <input
           name="search"
@@ -113,7 +111,6 @@ export default function UsersPage() {
         </button>
       </form>
 
-      {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-lg">
         <table className="w-full text-sm">
           <thead className="bg-white/5 text-white/70">
@@ -190,7 +187,6 @@ export default function UsersPage() {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex justify-between items-center">
         <p className="text-sm text-white/50">
           Page {meta.page} of {meta.totalPages}

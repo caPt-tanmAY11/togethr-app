@@ -19,7 +19,6 @@ export default function OnboardingStep2Skeleton() {
           text-white
         "
       >
-        {/* STEP HEADER */}
         <div className="mb-5 sm:mb-6 space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="h-3 w-16 bg-white/10 rounded animate-pulse" />
@@ -30,13 +29,11 @@ export default function OnboardingStep2Skeleton() {
           </div>
         </div>
 
-        {/* TITLE */}
         <div className="mb-5 sm:mb-6 space-y-2">
           <div className="h-6 sm:h-7 w-48 bg-white/10 rounded animate-pulse" />
           <div className="h-3 sm:h-3 w-64 bg-white/5 rounded animate-pulse" />
         </div>
 
-        {/* FORM SKELETON */}
         <div className="space-y-4 sm:space-y-5">
           {["organization", "linkedinUrl", "githubUrl", "XUrl", "portfolioUrl"].map(
             (_, idx) => (
@@ -47,7 +44,6 @@ export default function OnboardingStep2Skeleton() {
             )
           )}
 
-          {/* Buttons */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-2">
             <div className="h-10 w-full sm:w-1/2 bg-white/10 rounded-lg animate-pulse" />
             <div className="h-10 w-full sm:w-1/2 bg-white/10 rounded-lg animate-pulse" />

@@ -254,22 +254,17 @@
 }
 
 
-/* app/globals.css */
-
 :root {
-  /* Ensure your CSS variables are set to dark values */
   --background: #000000;
   --foreground: #ffffff;
 }
 
 html, body {
-  /* Prevents the white "flash" or bounce area */
   background-color: #000000 !important; 
   overscroll-behavior-y: none;
   height: 100%;
 }
 
-/* This specifically targets the "extra" space in iOS Safari */
 @supports (padding: env(safe-area-inset-bottom)) {
   body {
     padding-bottom: env(safe-area-inset-bottom);

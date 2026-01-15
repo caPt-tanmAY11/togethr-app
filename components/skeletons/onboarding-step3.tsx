@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 export default function OnboardingStep3Skeleton() {
-  const skeletonItems = [0]; // Represents one education block. You can add more indexes to show multiple blocks.
+  const skeletonItems = [0];
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4">
@@ -21,7 +21,6 @@ export default function OnboardingStep3Skeleton() {
           text-white
         "
       >
-        {/* STEP HEADER */}
         <div className="mb-5 sm:mb-6 space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="h-3 w-16 bg-white/10 rounded animate-pulse" />
@@ -32,47 +31,38 @@ export default function OnboardingStep3Skeleton() {
           </div>
         </div>
 
-        {/* TITLE */}
         <div className="mb-5 sm:mb-6 space-y-2">
           <div className="h-6 sm:h-7 w-40 bg-white/10 rounded animate-pulse" />
           <div className="h-3 sm:h-3 w-64 bg-white/5 rounded animate-pulse" />
         </div>
 
-        {/* FORM SKELETON */}
         <div className="space-y-5 sm:space-y-6">
           {skeletonItems.map((_, index) => (
             <motion.div
               key={index}
               className="relative rounded-xl border border-white/10 p-4 sm:p-5 space-y-4 bg-white/5"
             >
-              {/* Trash icon placeholder */}
               <div className="absolute top-3 right-3 h-4 w-4 bg-white/10 rounded-full animate-pulse" />
 
-              {/* Institution */}
               <div className="h-10 w-full bg-white/5 rounded-lg animate-pulse" />
 
-              {/* Degree / Field / Grade */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div className="h-10 w-full bg-white/5 rounded-lg animate-pulse" />
                 <div className="h-10 w-full bg-white/5 rounded-lg animate-pulse" />
                 <div className="h-10 w-full bg-white/5 rounded-lg animate-pulse" />
               </div>
 
-              {/* Start / End Year */}
               <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="h-10 w-full bg-white/5 rounded-lg animate-pulse" />
                 <div className="h-10 w-full bg-white/5 rounded-lg animate-pulse" />
               </div>
 
-              {/* Description */}
               <div className="h-16 w-full bg-white/5 rounded-lg animate-pulse" />
             </motion.div>
           ))}
 
-          {/* Add another button */}
           <div className="h-10 w-48 bg-white/10 rounded-lg animate-pulse" />
 
-          {/* Navigation buttons */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-4">
             <div className="h-10 w-full sm:w-1/2 bg-white/10 rounded-lg animate-pulse" />
             <div className="h-10 w-full sm:w-1/2 bg-white/10 rounded-lg animate-pulse" />

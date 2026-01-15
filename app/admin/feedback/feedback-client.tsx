@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Image from "next/image";
 
 type Feedback = {
   id: string;
@@ -61,7 +60,6 @@ export default function FeedbackPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Feedback</h1>
         <p className="text-white/60 mt-1">
@@ -69,7 +67,6 @@ export default function FeedbackPage() {
         </p>
       </div>
 
-      {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-lg">
         <table className="w-full text-sm">
           <thead className="bg-white/5 text-white/70">
@@ -87,7 +84,6 @@ export default function FeedbackPage() {
                 key={fb.id}
                 className="border-t border-white/10 hover:bg-white/5 transition"
               >
-                {/* User */}
                 <td className="px-6 py-4">
                   {fb.user ? (
                     <div className="flex items-center gap-3">
@@ -101,12 +97,10 @@ export default function FeedbackPage() {
                   )}
                 </td>
 
-                {/* Message */}
                 <td className="px-6 py-4 max-w-md">
                   <p className="line-clamp-3 text-white/80">{fb.message}</p>
                 </td>
 
-                {/* Rating */}
                 <td className="px-6 py-4">
                   <div className="flex gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -122,7 +116,6 @@ export default function FeedbackPage() {
                   </div>
                 </td>
 
-                {/* Date */}
                 <td className="px-6 py-4 text-white/60">
                   {new Date(fb.createdAt).toLocaleDateString()}
                 </td>
@@ -143,7 +136,6 @@ export default function FeedbackPage() {
         </table>
       </div>
 
-      {/* Pagination */}
       {meta && (
         <div className="flex justify-between items-center">
           <p className="text-sm text-white/50">

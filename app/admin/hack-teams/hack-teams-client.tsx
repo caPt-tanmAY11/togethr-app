@@ -85,7 +85,6 @@ export default function HackTeamsPageClient() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold">Hack Teams</h1>
         <p className="text-white/60 mt-1">
@@ -93,7 +92,6 @@ export default function HackTeamsPageClient() {
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2">
         {["teams", "requests"].map((t) => (
           <button
@@ -107,7 +105,6 @@ export default function HackTeamsPageClient() {
         ))}
       </div>
 
-      {/* SEARCH */}
       {tab === "teams" && (
         <form
           onSubmit={(e) => {
@@ -126,7 +123,6 @@ export default function HackTeamsPageClient() {
         </form>
       )}
 
-      {/* TEAMS TABLE */}
       {tab === "teams" && (
         <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
           <table className="w-full text-sm">
@@ -154,7 +150,6 @@ export default function HackTeamsPageClient() {
         </div>
       )}
 
-      {/* REQUESTS TABLE */}
       {tab === "requests" && (
         <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
           <table className="w-full text-sm">

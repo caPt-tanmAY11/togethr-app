@@ -1,9 +1,7 @@
-// app/layout.tsx
-import type { Metadata, Viewport } from "next"; // Added Viewport import
+import type { Metadata, Viewport } from "next";
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import Footer from "@/components/footer";
 import { FeedbackProvider } from "@/components/feeback/feedback-context";
 import FeedbackModal from "@/components/feeback/feedback-modal";
 
@@ -12,7 +10,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  viewportFit: "cover", // This tells the browser to use the full screen area
+  viewportFit: "cover",
   themeColor: "#000000",
 };
 
@@ -42,7 +40,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Add "dark" class and set background color here
     <html lang="en" className="dark" style={{ backgroundColor: "#000000" }}>
       <body
         className={`

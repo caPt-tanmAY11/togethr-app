@@ -55,7 +55,6 @@ export default function OnboardingStep3() {
 
     loadEducation();
   }, []);
-  /* ------------------------------------------------------------ */
 
   function updateField(
     index: number,

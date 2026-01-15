@@ -126,7 +126,6 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold">Projects</h1>
         <p className="text-white/60 mt-1">
@@ -134,7 +133,6 @@ export default function ProjectsPage() {
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2">
         {["projects", "requests"].map((t) => (
           <button
@@ -148,7 +146,6 @@ export default function ProjectsPage() {
         ))}
       </div>
 
-      {/* Search */}
       {tab === "projects" && (
         <form onSubmit={handleSearch} className="max-w-md">
           <input
@@ -160,7 +157,6 @@ export default function ProjectsPage() {
         </form>
       )}
 
-      {/* PROJECTS TABLE */}
       {tab === "projects" && (
         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-lg overflow-hidden">
           <table className="w-full text-sm">
@@ -227,7 +223,6 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      {/* REQUESTS TABLE */}
       {tab === "requests" && (
         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-lg overflow-hidden">
           <table className="w-full text-sm">
