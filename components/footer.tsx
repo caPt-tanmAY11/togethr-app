@@ -3,12 +3,12 @@ export default function Footer() {
     <footer className="relative overflow-hidden">
       <div className="absolute inset-x-0 -top-24 h-40 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
-      <div className="relative backdrop-blur-2xl bg-black/95 border-t border-white/10">
+      <div className="relative backdrop-blur-2xl bg-[#111111] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-14">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-white/80">
             <div>
               <h2 className="text-2xl font-semibold text-white tracking-wide">
-                togethr<span className="text-white/60">.</span>
+                togethr<span className="text-[#27b49c]">.</span>
               </h2>
 
               <p className="mt-4 text-sm leading-relaxed text-white/50 max-w-sm">
