@@ -193,7 +193,7 @@ export default function Home() {
                 </h3>
 
                 <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                  Togethr replaces random DMs and last-minute chaos with clear
+                  togethr replaces random DMs and last-minute chaos with clear
                   roles, expectations, and request-based joining. Team leaders
                   stay in control, and contributors know exactly what they’re
                   signing up for.
@@ -225,7 +225,7 @@ export default function Home() {
                 </h3>
 
                 <p className="text-white/70 text-lg sm:text-xl leading-relaxed">
-                  Togethr isn’t limited to weekend hackathons. Build long-term
+                  togethr isn’t limited to weekend hackathons. Build long-term
                   projects, find serious collaborators, and keep working
                   together even after the event ends.
                 </p>

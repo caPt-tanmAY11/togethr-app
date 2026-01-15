@@ -11,11 +11,14 @@ export default function SigninForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo") ?? "/";
 
   async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    setLoading(true);
 
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
@@ -48,6 +51,9 @@ export default function SigninForm() {
             router.replace("/main/hacks-teamup");
           }
         },
+        onResponse: (ctx) => {
+          setLoading(false);
+        }
       }
     );
   }
@@ -114,10 +120,11 @@ export default function SigninForm() {
 
         <button
           type="submit"
+          disabled={loading}
           className="auth-form-main-btn text-white rounded-lg py-2 px-5 font-medium transition-all duration-300
-                    cursor-pointer hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(68,156,141,0.6)] active:scale-95"
+                    cursor-pointer hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(68,156,141,0.6)] active:scale-95 disabled:opacity-60"
         >
-          Sign in
+          {loading ? "Signing you in..." : "Sign in"}
         </button>
       </div>
     </form>

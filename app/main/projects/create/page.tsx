@@ -175,15 +175,22 @@ export default function CreateProjectPage() {
                   rows={3}
                   maxLength={220}
                   placeholder="Short description (what & why) *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
+                  className="
+    w-full rounded-lg bg-white/10
+    px-4 py-3 text-sm
+    resize-none outline-none
+    border border-white/15
+    focus:ring-1 focus:ring-[#f36262]
+    whitespace-pre-wrap
+  "
                 />
 
                 <textarea
                   name="detailed-desc"
-                  rows={5}
+                  rows={9}
                   maxLength={2500}
                   placeholder="Detailed description (problem, solution, scope) *"
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
+                  className="w-full rounded-lg bg-white/10 px-4 py-3 whitespace-pre-wrap text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
                 />
               </div>
             </motion.div>
@@ -247,7 +254,7 @@ export default function CreateProjectPage() {
                 rows={3}
                 name="extra-note"
                 placeholder="What kind of collaborators are you looking for?"
-                className="mt-4 w-full rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
+                className="mt-4 w-full whitespace-pre-wrap rounded-lg bg-white/10 px-4 py-3 text-sm resize-none outline-none focus:ring-1 focus:ring-[#f36262] border border-white/15"
               />
             </motion.div>
 

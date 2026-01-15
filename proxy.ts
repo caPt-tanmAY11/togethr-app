@@ -122,7 +122,7 @@ export async function proxy(req: NextRequest) {
 
         if (!emailVerified && !isOnboardingRoute) {
             return NextResponse.redirect(
-                new URL("/onboarding", req.url)
+                new URL("/onboarding/step-1", req.url)
             );
         }
 

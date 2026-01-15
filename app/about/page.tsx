@@ -30,7 +30,7 @@ export default function About() {
 
           <div className="space-y-5 text-lg text-white/80 leading-relaxed max-w-3xl">
             <p>
-              Togethr is not just a web application or a user platform. It is a
+              togethr is not just a web application or a user platform. It is a
               community of curious, enthusiastic students, developers, and
               builders who want to create real things together.
             </p>
@@ -41,7 +41,7 @@ export default function About() {
               and last-minute stress.
             </p>
             <p className="text-white font-medium">
-              That problem is what led to Togethr.
+              That problem is what led to togethr.
             </p>
           </div>
         </motion.div>
@@ -58,7 +58,7 @@ export default function About() {
               Finding the right people
             </h3>
             <p className="text-white/70 text-lg leading-relaxed">
-              Togethr helps you find people who share the same mindset, goals,
+              togethr helps you find people who share the same mindset, goals,
               and seriousness. Whether it’s for hackathons or long-term
               projects, the platform focuses on real collaboration, not just
               temporary teaming up.
@@ -76,7 +76,7 @@ export default function About() {
               Clear and structured collaboration
             </h3>
             <p className="text-white/70 text-lg leading-relaxed">
-              To avoid spam and chaos, Togethr uses a structured request system.
+              To avoid spam and chaos, togethr uses a structured request system.
               Users send join or collaboration requests, and team leads or
               project owners review and approve them. This keeps everything
               intentional and organized.
@@ -94,7 +94,7 @@ export default function About() {
               Trust built through action
             </h3>
             <p className="text-white/70 text-lg leading-relaxed">
-              Togethr includes a trust score system to reduce fake profiles and
+              togethr includes a trust score system to reduce fake profiles and
               spam. Trust is earned through real actions, like being accepted
               into teams or projects - so credibility comes from actual platform
               activity, not just claims.
@@ -112,11 +112,11 @@ export default function About() {
           <p className="text-white/80 text-lg leading-relaxed">
             Whether you are starting a hackathon team, building a long-term
             project, or looking for serious builders to collaborate with,
-            Togethr gives you a clean and focused space to work together.
+            togethr gives you a clean and focused space to work together.
           </p>
           <p className="mt-4 text-lg text-white font-medium">
             We believe good teams are built on clarity, trust, and shared goals
-            - and Togethr is designed around exactly that.
+            - and togethr is designed around exactly that.
           </p>
         </motion.div>
       </div>

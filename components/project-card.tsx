@@ -30,13 +30,14 @@ export default function ProjectCard({
           </h1>
 
           <p className="text-base font-medium text-white/80">
-            Stage:{" "}
-            <span className="text-[#f36262] font-semibold">{stage}</span>
+            Stage: <span className="text-[#f36262] font-semibold">{stage}</span>
           </p>
         </div>
 
         <div className="bg-white/5 flex flex-col gap-3 py-4 px-4 rounded-lg border border-white/10 shadow-inner">
-          <p className="text-sm text-[#a1a1a1] leading-relaxed wrap-break-word">{shortDesc}</p>
+          <p className="text-sm text-[#a1a1a1] leading-relaxed break-words whitespace-pre-line">
+            {shortDesc.length > 90 ? shortDesc.slice(0, 90) + "..." : shortDesc}
+          </p>
 
           <p className="text-sm font-semibold text-white/90 mt-2">
             Commitment:{" "}
@@ -68,9 +69,7 @@ export default function ProjectCard({
         <div className="font-inter text-sm px-1">
           <p>
             Contributors:{" "}
-            <span className="font-medium text-[#f36262]">
-              {currentMembers}
-            </span>
+            <span className="font-medium text-[#f36262]">{currentMembers}</span>
           </p>
 
           <p className="mt-3">Tags:</p>

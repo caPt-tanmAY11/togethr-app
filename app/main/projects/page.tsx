@@ -301,6 +301,7 @@ export default function Projects() {
     Boolean(projectCommitmentFilter) ||
     Boolean(projectStageFilter) ||
     Boolean(scopeFilter) ||
+    // scopeFilter !== "ALL" ||
     skills.length > 0;
 
   if (!loading && projects.length === 0) {

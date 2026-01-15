@@ -3,13 +3,16 @@
 import { authClient } from "@/lib/auth-client";
 import { isValidEmail } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function SignupForm() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
 
     const formData = new FormData(e.target as HTMLFormElement);
     const name = formData.get("name") as string;
@@ -42,6 +45,9 @@ export default function SignupForm() {
 
           router.push("/auth/signin");
         },
+        onResponse: () => {
+          setLoading(false);
+        } 
       }
     );
   }
@@ -105,6 +111,7 @@ export default function SignupForm() {
 
         <button
           type="submit"
+          disabled={loading}
           className="
             auth-form-main-btn
             text-white rounded-lg py-2 px-5 font-medium
@@ -112,9 +119,10 @@ export default function SignupForm() {
             hover:scale-[1.03]
             hover:shadow-[0_0_15px_rgba(68,156,141,0.6)]
             active:scale-95
+            disabled:opacity-60
           "
         >
-          Sign up
+          {loading ? "Creating your account..." : "Sign up"}
         </button>
       </div>
     </form>

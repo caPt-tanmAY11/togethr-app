@@ -337,7 +337,7 @@ export default function ProjectDetailsPage() {
               </div>
 
               <div>
-                <p className="text-[#a5a5a5] font-medium">
+                <p className="text-[#a5a5a5] font-medium whitespace-pre-line">
                   {project.shortDesc}
                 </p>
               </div>
@@ -385,7 +385,7 @@ export default function ProjectDetailsPage() {
               {project.extraNote && (
                 <div>
                   <h2 className="font-semibold">Extra Note</h2>
-                  <p className="text-sm text-[#bdbdbd] mt-1">
+                  <p className="text-sm text-[#bdbdbd] mt-1 whitespace-pre-line">
                     {project.extraNote}
                   </p>
                 </div>
@@ -424,7 +424,7 @@ export default function ProjectDetailsPage() {
             </p> */}
 
               <div>
-                <p className="text-[#a5a5a5] font-medium">
+                <p className="text-[#a5a5a5] font-medium whitespace-pre-line">
                   {project.detailedDesc}
                 </p>
               </div>

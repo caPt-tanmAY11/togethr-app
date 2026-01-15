@@ -47,7 +47,10 @@ export async function PATCH(req: Request) {
                 title: a.title ?? null,
                 description: a.description ?? null,
                 issuer: a.issuer ?? null,
-                category: a.category ?? null,
+                category:
+                    a.category && a.category !== ""
+                        ? a.category
+                        : undefined,
                 proofUrl: a.proofUrl ?? null,
             })),
         });

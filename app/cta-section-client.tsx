@@ -16,7 +16,8 @@ export default function CTASectionClient() {
       </h2>
 
       <Link
-        href={session?.user ? "/main/hacks-teamup" : "/auth/signin"}
+        href="/main/hacks-teamup"
+        // href={session?.user ? "/main/hacks-teamup" : "/auth/signin"}
         className="auth-form-main-btn text-white rounded-4xl py-4 px-7 font-medium transition-all duration-300
                     cursor-pointer hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(68,156,141,0.6)] active:scale-95"
       >

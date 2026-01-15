@@ -27,14 +27,16 @@ export default function HeroSectionClient() {
 
       <motion.div className="my-8 sm:my-10 flex flex-col sm:flex-row gap-4 sm:gap-10">
         <Link
-          href={session?.user ? "/main/hacks-teamup" : "/auth/signin"}
+          href="/main/hacks-teamup"
+          // href={session?.user ? "/main/hacks-teamup" : "/auth/signin"}
           className="auth-form-main-btn text-white rounded-lg py-3 sm:py-4 px-5 sm:px-7 font-medium transition-all duration-300
                     cursor-pointer hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(68,156,141,0.6)] active:scale-95"
         >
           Explore hack-teams
         </Link>
         <Link
-          href={session?.user ? "/main/projects" : "/auth/signin"}
+          href="/main/projects"
+          // href={session?.user ? "/main/projects" : "/auth/signin"}
           className="auth-form-glass-btn text-white rounded-lg py-3 sm:py-4 px-5 sm:px-7 font-medium transition-all duration-300
                     cursor-pointer hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(68,156,141,0.6)] active:scale-95"
         >
