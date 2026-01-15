@@ -46,7 +46,6 @@ export default function ContactUs() {
 
   return (
     <div className="relative min-h-screen bg-[#090a15] text-white font-inter overflow-hidden">
-      {/* ---------------- BLUR BLOBS ---------------- */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <div
           className="absolute -top-32 -left-32 h-72 w-72 sm:h-105 sm:w-105 rounded-full blur-[120px] sm:blur-[160px] opacity-70"
@@ -58,10 +57,8 @@ export default function ContactUs() {
         />
       </div>
 
-      {/* ---------------- CONTENT ---------------- */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 my-20 sm:my-2">
         <div className="w-full max-w-5xl space-y-10">
-          {/* ---------------- HEADER GLASS ---------------- */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,9 +81,7 @@ export default function ContactUs() {
             </p>
           </motion.div>
 
-          {/* ---------------- ROW 2 ---------------- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {/* ---------------- LEFT INFO GLASS ---------------- */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -112,7 +107,7 @@ export default function ContactUs() {
               <div className="space-y-4 text-sm">
                 <div>
                   <p className="text-white/50">Email</p>
-                  <p className="text-white font-medium">support@togethr.dev</p>
+                  <p className="text-white font-medium">community.togethr@gmail.com</p>
                 </div>
 
                 <div>
@@ -122,7 +117,6 @@ export default function ContactUs() {
               </div>
             </motion.div>
 
-            {/* ---------------- FORM GLASS ---------------- */}
             <motion.form
               onSubmit={handleSubmit}
               initial={{ opacity: 0, x: 20 }}
@@ -130,7 +124,6 @@ export default function ContactUs() {
               transition={{ delay: 0.15, duration: 0.6 }}
               className="backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/10 rounded-3xl p-8 sm:p-10 space-y-5"
             >
-              {/* Name */}
               <input
                 type="text"
                 placeholder="Your name"
@@ -139,7 +132,6 @@ export default function ContactUs() {
                 className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
               />
 
-              {/* Email */}
               <input
                 type="email"
                 placeholder="you@example.com"
@@ -148,7 +140,6 @@ export default function ContactUs() {
                 className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-teal-600 border border-white/15"
               />
 
-              {/* Message */}
               <textarea
                 rows={4}
                 placeholder="Tell us how we can help..."

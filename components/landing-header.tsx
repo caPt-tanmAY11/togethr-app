@@ -27,7 +27,7 @@ export default function LandingHeader({ session }: { session: any }) {
         {!session?.user && (
           <Link
             href="/auth/signin"
-            className="flex items-center gap-2
+            className="hidden items-center gap-2
             text-gray-300 hover:text-white
             text-sm px-4 py-1.5 rounded-2xl bg-white/10
             hover:bg-white/20 cursor-pointer"

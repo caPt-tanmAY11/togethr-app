@@ -43,15 +43,17 @@ export default function ForgotPasswordForm() {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen px-4 overflow-hidden">
+    <div className="relative flex-1 flex justify-center items-center px-4 py-8">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-md
+        className="relative z-10
         backdrop-blur-2xl bg-black/40
         border border-white/10 rounded-2xl
-        p-8 sm:p-10 text-white"
+        p-8 sm:p-10
+        w-full max-w-100 md:max-w-100 mx-auto text-white my-auto
+        "
       >
         <div className="text-center mb-8">
           <h1 className="text-2xl font-poppins font-semibold tracking-wide">

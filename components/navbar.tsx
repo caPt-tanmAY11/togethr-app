@@ -169,16 +169,18 @@ export default function Navbar() {
             </Link>
           )}
 
-          <button
-            onClick={openFeedback}
-            className="flex items-center gap-2
+          {!isPending && isAuthenticated && (
+            <button
+              onClick={openFeedback}
+              className="flex items-center gap-2
   text-gray-300 hover:text-white
   text-sm px-4 py-1.5 rounded-md bg-white/10
   hover:bg-white/20 cursor-pointer font-semibold"
-          >
-            <MessageSquare size={16} />
-            Feedback
-          </button>
+            >
+              <MessageSquare size={16} />
+              Feedback
+            </button>
+          )}
 
           {!isPending &&
             (isAuthenticated ? (
@@ -424,20 +426,24 @@ export default function Navbar() {
                   </motion.div>
                 )}
 
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => {
-                    openFeedback();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center justify-center gap-2
+                {!isPending && isAuthenticated && (
+                  <>
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        openFeedback();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center justify-center gap-2
             text-lg px-5 py-3 rounded-2xl
             text-gray-300 hover:text-white
             bg-white/10 hover:bg-white/20"
-                >
-                  <MessageSquare size={18} />
-                  Feedback
-                </motion.button>
+                    >
+                      <MessageSquare size={18} />
+                      Feedback
+                    </motion.button>
+                  </>
+                )}
               </div>
 
               <div
