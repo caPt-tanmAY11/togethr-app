@@ -370,7 +370,7 @@ export default function SettingsPage() {
 
         <button
           disabled={loading}
-          className="auth-form-main-btn w-full py-3 rounded-xl disabled:opacity-60"
+          className="auth-form-main-btn w-full py-3 rounded-xl disabled:opacity-60 cursor-pointer"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>
@@ -478,10 +478,10 @@ function Textarea({
     <div className="space-y-1">
       <label className="text-sm text-white/60">{label}</label>
       <textarea
-        rows={5}
+        rows={7}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/10 px-3 py-2 rounded-md outline-none text-white border border-white/15 focus:ring-1 focus:ring-teal-600 resize-none"
+        className="w-full bg-white/10 px-3 py-2 whitespace-pre-wrap rounded-md outline-none text-white border border-white/15 focus:ring-1 focus:ring-teal-600 resize-none"
       />
     </div>
   );

@@ -624,7 +624,7 @@ export default function ProfilePage() {
                   About
                 </h2>
 
-                <p className="text-sm sm:text-base text-white/70 mb-4 sm:mb-6 leading-relaxed break-words">
+                <p className="text-sm whitespace-pre-line sm:text-base text-white/70 mb-4 sm:mb-6 leading-relaxed wrap-break-word">
                   {profile.about || "No bio provided yet."}
                 </p>
 
