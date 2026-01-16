@@ -4,9 +4,24 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import LandingHeaderSkeleton from "./skeletons/landing-header-skeleton";
 
-export default function LandingHeader({ session }: { session: any }) {
+export default function LandingHeader({
+  session,
+  isPending,
+}: {
+  session: any;
+  isPending: boolean;
+}) {
   const [open, setOpen] = useState(false);
+
+  if (isPending) {
+    return (
+      <>
+        <LandingHeaderSkeleton />
+      </>
+    );
+  }
 
   return (
     <header className="relative w-full border-b border-white/10">
@@ -16,15 +31,21 @@ export default function LandingHeader({ session }: { session: any }) {
         </h1>
 
         <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
-          <Link href="/about" className="hover:text-white text-lg font-semibold transition">
+          <Link
+            href="/about"
+            className="hover:text-white text-lg font-semibold transition"
+          >
             About
           </Link>
-          <Link href="/contact-us" className="hover:text-white text-lg font-semibold transition">
+          <Link
+            href="/contact-us"
+            className="hover:text-white text-lg font-semibold transition"
+          >
             Contact
           </Link>
         </nav>
 
-        {!session?.user && (
+        {!isPending && !session?.user && (
           <Link
             href="/auth/signin"
             className="sm:flex hidden items-center gap-2
@@ -73,7 +94,6 @@ export default function LandingHeader({ session }: { session: any }) {
               </Link>
 
               {!session?.user && (
-
                 <Link
                   href="/auth/signin"
                   onClick={() => setOpen(false)}
