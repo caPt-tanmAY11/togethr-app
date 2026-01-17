@@ -43,6 +43,9 @@ export default function CreateHackTeam() {
     location: "",
   });
 
+  const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
+  const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpg"];
+
   const createTeamMutation = useMutation({
     mutationFn: async (teamData: any) => {
       const res = await fetch("/api/hack-team", {
@@ -58,6 +61,11 @@ export default function CreateHackTeam() {
 
     onSuccess: async (data, variables) => {
       if (teamImage) {
+        if (teamImage.size > MAX_IMAGE_SIZE) {
+          toast.error("Team created, but image exceeded size limit");
+          return;
+        }
+
         const imageFormData = new FormData();
         imageFormData.append("file", teamImage);
         imageFormData.append("type", "hack-team");
@@ -124,7 +132,7 @@ export default function CreateHackTeam() {
   });
 
   async function handleCreateTeamFormSubmit(
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
@@ -146,6 +154,18 @@ export default function CreateHackTeam() {
     if (!isValidEmail(teamData.teamLeadEmail)) {
       toast.error("Please enter a valid email address");
       return;
+    }
+
+    if (teamImage) {
+      if (!ALLOWED_IMAGE_TYPES.includes(teamImage.type)) {
+        toast.error("Only PNG or JPG images are allowed");
+        return;
+      }
+
+      if (teamImage.size > MAX_IMAGE_SIZE) {
+        toast.error("Image size must be less than 10 MB");
+        return;
+      }
     }
 
     createTeamMutation.mutate(teamData);
@@ -195,7 +215,7 @@ export default function CreateHackTeam() {
                   ) : (
                     <div className="text-center text-white/50">
                       <p className="font-medium">Upload team image</p>
-                      <p className="text-sm mt-1">PNG or JPG</p>
+                      <p className="text-sm mt-1">PNG or JPG • Max 10 MB</p>
                     </div>
                   )}
                 </div>
