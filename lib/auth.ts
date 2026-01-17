@@ -106,5 +106,5 @@ export const auth = betterAuth({
                 },
             },
         }
-    }
+    },
 });

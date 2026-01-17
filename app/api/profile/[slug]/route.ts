@@ -19,8 +19,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
       headers: await headers(),
     });
 
-    if (!session) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 403 })
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const profileUser = await prisma.user.findUnique({

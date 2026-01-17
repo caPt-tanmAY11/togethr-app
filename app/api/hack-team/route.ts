@@ -44,66 +44,103 @@ export async function POST(req: Request) {
         } = body;
 
         if (!name?.trim()) {
-            return NextResponse.json({ success: false, error: "Team name is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Team name is required", fields: ["name"] },
+                { status: 400 }
+            );
         }
 
         if (!origin?.city?.trim()) {
-            return NextResponse.json({ success: false, error: "City is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "City is required", fields: ["origin.city"] },
+                { status: 400 }
+            );
         }
 
         if (!origin?.country?.trim()) {
-            return NextResponse.json({ success: false, error: "Country is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Country is required", fields: ["origin.country"] },
+                { status: 400 }
+            );
         }
 
         if (!size || typeof size !== "number") {
-            return NextResponse.json({ success: false, error: "Team size is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Team size is required", fields: ["size"] },
+                { status: 400 }
+            );
         }
 
         if (!Array.isArray(skillStack)) {
-            return NextResponse.json({ success: false, error: "Skill stack must be an array" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Skill stack must be an array", fields: ["skillStack"] },
+                { status: 400 }
+            );
         }
 
         if (skillStack.length === 0) {
-            return NextResponse.json({ success: false, error: "At least one skill is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "At least one skill is required", fields: ["skillStack"] },
+                { status: 400 }
+            );
         }
 
         if (!hackDetails?.name?.trim()) {
-            return NextResponse.json({ success: false, error: "Hackathon name is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Hackathon name is required", fields: ["hackDetails.name"] },
+                { status: 400 }
+            );
         }
 
         if (!hackDetails?.startTime) {
-            return NextResponse.json({ success: false, error: "Hackathon start time is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Hackathon start time is required", fields: ["hackDetails.startTime"] },
+                { status: 400 }
+            );
         }
 
         if (!hackDetails?.endTime) {
-            return NextResponse.json({ success: false, error: "Hackathon end time is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Hackathon end time is required", fields: ["hackDetails.endTime"] },
+                { status: 400 }
+            );
         }
 
         if (!hackDetails?.location?.trim()) {
-            return NextResponse.json({ success: false, error: "Hackathon location is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Hackathon location is required", fields: ["hackDetails.location"] },
+                { status: 400 }
+            );
         }
 
         if (!hackDetails?.mode?.trim()) {
-            return NextResponse.json({ success: false, error: "Hackathon mode is required" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Hackathon mode is required", fields: ["hackDetails.mode"] },
+                { status: 400 }
+            );
         }
 
         if (!teamLeadEmail?.trim()) {
             return NextResponse.json(
-                { success: false, error: "Team lead email is required" },
+                { success: false, error: "Team lead email is required", fields: ["teamLeadEmail"] },
                 { status: 400 }
             );
         }
 
         if (!isValidEmail(teamLeadEmail)) {
             return NextResponse.json(
-                { success: false, error: "Invalid team lead email format" },
+                { success: false, error: "Invalid team lead email format", fields: ["teamLeadEmail"] },
                 { status: 400 }
             );
         }
 
         if (Number.isNaN(size) || size < 1) {
-            return NextResponse.json({ success: false, error: "Invalid team size" }, { status: 400 });
+            return NextResponse.json(
+                { success: false, error: "Invalid team size", fields: ["size"] },
+                { status: 400 }
+            );
         }
+
 
         const hackTeam = await prisma.hackTeam.create({
             data: {
@@ -207,7 +244,21 @@ export async function GET(req: NextRequest) {
         const skills = searchParams
             .get("skills")
             ?.split(",")
-            .map(skill => skill.toLowerCase().trim());
+            .map(s => s.toLowerCase().trim())
+            .filter(Boolean);
+
+        const requiresAuthScopes = ["MY_TEAM", "REQUESTED", "JOINED_IN"];
+
+        if (requiresAuthScopes.includes(scope) && !userId) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: "Authentication required",
+                },
+                { status: 401 }
+            );
+        }
+
 
         const whereClause: Prisma.HackTeamWhereInput = {
             ...(mode && { hackMode: mode }),

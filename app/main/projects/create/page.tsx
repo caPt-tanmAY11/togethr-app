@@ -26,6 +26,12 @@ export default function CreateProjectPage() {
     e: React.FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
+
+    if (!session?.user?.id) {
+      toast.error("You must be logged in to create a project");
+      return;
+    }
+
     if (isCreating) return;
 
     setIsCreating(true);
@@ -65,51 +71,40 @@ export default function CreateProjectPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        if (
-          data.fields &&
-          Array.isArray(data.fields) &&
-          data.fields.length > 0
-        ) {
-          const field = data.fields[0];
-          let msg = "";
-
-          switch (field) {
-            case "title":
-              msg = "Project title is required";
-              break;
-            case "shortDesc":
-              msg = "Short description is required";
-              break;
-            case "detailedDesc":
-              msg = "Detailed description is required";
-              break;
-            case "stage":
-              msg = "Project stage is required";
-              break;
-            case "commitment":
-              msg = "Commitment is required";
-              break;
-            case "contactEmail":
-              msg = "Contact email is required";
-              break;
-            case "ownerLinkedInURL":
-              msg = "LinkedIn URL is required";
-              break;
-            case "ownerId":
-            case "ownerName":
-              msg = "Owner information is missing";
-              break;
-            case "tags":
-              msg = "Add at least one project tag";
-              break;
-            case "skillStack":
-              msg = "Add at least one skill";
-              break;
-            default:
-              msg = "Some required field is missing";
-          }
-
-          toast.error(msg);
+        if (data.fields?.length) {
+          data.fields.forEach((field: string) => {
+            let msg = "Some required field is missing";
+            switch (field) {
+              case "title":
+                msg = "Project title is required";
+                break;
+              case "shortDesc":
+                msg = "Short description is required";
+                break;
+              case "detailedDesc":
+                msg = "Detailed description is required";
+                break;
+              case "stage":
+                msg = "Project stage is required";
+                break;
+              case "commitment":
+                msg = "Commitment is required";
+                break;
+              case "contactEmail":
+                msg = "Contact email is required";
+                break;
+              case "ownerLinkedInURL":
+                msg = "LinkedIn URL is required";
+                break;
+              case "tags":
+                msg = "Add at least one project tag";
+                break;
+              case "skillStack":
+                msg = "Add at least one skill";
+                break;
+            }
+            toast.error(msg);
+          });
         } else {
           toast.error(data?.error || "Failed to create project");
         }

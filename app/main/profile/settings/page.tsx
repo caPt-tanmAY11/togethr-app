@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ChangePasswordModal from "@/components/auth/change-password-modal";
 import SkillStackSection from "@/components/skill-stack-section";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import ProfileSettingsSkeleton from "@/components/skeletons/profile-settings-skeleton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ProfileResponse {
   name: string;
@@ -15,14 +16,11 @@ interface ProfileResponse {
   locationCity: string | null;
   locationCountry: string | null;
   about: string | null;
-
   linkedinUrl: string | null;
   githubUrl: string | null;
   portfolioUrl: string | null;
   XUrl: string | null;
-
   skills: string[];
-
   education: {
     institution: string;
     degree: string | null;
@@ -32,7 +30,6 @@ interface ProfileResponse {
     grade: string | null;
     description: string | null;
   }[];
-
   achievements: {
     title: string;
     description: string | null;
@@ -44,121 +41,132 @@ interface ProfileResponse {
 }
 
 export default function SettingsPage() {
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
-  const [hasPassword, setHasPassword] = useState(false);
+  const cachedData = queryClient.getQueryData<{
+    profile: ProfileResponse;
+    hasPassword: boolean;
+  }>(["profile-update-data"]);
 
-  const [name, setName] = useState("");
-  const [headline, setHeadline] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [locationCity, setLocationCity] = useState("");
-  const [locationCountry, setLocationCountry] = useState("");
-  const [about, setAbout] = useState("");
-
-  const [linkedinUrl, setLinkedInUrl] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [portfolioUrl, setPortfolioUrl] = useState("");
-  const [XUrl, setXUrl] = useState("");
-
-  const [skills, setSkills] = useState<string[]>([]);
-
-  const [education, setEducation] = useState<ProfileResponse["education"]>([]);
+  const [hasPassword, setHasPassword] = useState(
+    cachedData?.hasPassword ?? false
+  );
+  const [name, setName] = useState(cachedData?.profile?.name ?? "");
+  const [headline, setHeadline] = useState(cachedData?.profile?.headline ?? "");
+  const [organization, setOrganization] = useState(
+    cachedData?.profile?.organization ?? ""
+  );
+  const [locationCity, setLocationCity] = useState(
+    cachedData?.profile?.locationCity ?? ""
+  );
+  const [locationCountry, setLocationCountry] = useState(
+    cachedData?.profile?.locationCountry ?? ""
+  );
+  const [about, setAbout] = useState(cachedData?.profile?.about ?? "");
+  const [linkedinUrl, setLinkedInUrl] = useState(
+    cachedData?.profile?.linkedinUrl ?? ""
+  );
+  const [githubUrl, setGithubUrl] = useState(
+    cachedData?.profile?.githubUrl ?? ""
+  );
+  const [portfolioUrl, setPortfolioUrl] = useState(
+    cachedData?.profile?.portfolioUrl ?? ""
+  );
+  const [XUrl, setXUrl] = useState(cachedData?.profile?.XUrl ?? "");
+  const [skills, setSkills] = useState<string[]>(
+    cachedData?.profile?.skills ?? []
+  );
+  const [education, setEducation] = useState<ProfileResponse["education"]>(
+    cachedData?.profile?.education ?? []
+  );
   const [achievements, setAchievements] = useState<
     ProfileResponse["achievements"]
-  >([]);
+  >(cachedData?.profile?.achievements ?? []);
+
+  const { data: freshData, isLoading: initialLoading } = useQuery({
+    queryKey: ["profile-update-data"],
+    queryFn: async () => {
+      const res = await fetch("/api/profile/update");
+      const data = await res.json();
+      if (!res.ok || !data.profile) throw new Error("Invalid profile response");
+      return data;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const res = await fetch("/api/profile/update");
-        const data = await res.json();
-
-        if (!res.ok || !data.profile) {
-          throw new Error("Invalid profile response");
-        }
-
-        const profile: ProfileResponse = data.profile;
-
-        setName(profile.name ?? "");
-        setHeadline(profile.headline ?? "");
-        setOrganization(profile.organization ?? "");
-        setLocationCity(profile.locationCity ?? "");
-        setLocationCountry(profile.locationCountry ?? "");
-        setAbout(profile.about ?? "");
-
-        setLinkedInUrl(profile.linkedinUrl ?? "");
-        setGithubUrl(profile.githubUrl ?? "");
-        setPortfolioUrl(profile.portfolioUrl ?? "");
-        setXUrl(profile.XUrl ?? "");
-
-        setSkills(profile.skills ?? []);
-
-        setEducation(profile.education ?? []);
-        setAchievements(profile.achievements ?? []);
-
-        setHasPassword(data.hasPassword);
-      } catch {
-        toast.error("Failed to load profile data");
-      } finally {
-        setInitialLoading(false);
-      }
+    if (freshData?.profile) {
+      const p = freshData.profile;
+      setName(p.name ?? "");
+      setHeadline(p.headline ?? "");
+      setOrganization(p.organization ?? "");
+      setLocationCity(p.locationCity ?? "");
+      setLocationCountry(p.locationCountry ?? "");
+      setAbout(p.about ?? "");
+      setLinkedInUrl(p.linkedinUrl ?? "");
+      setGithubUrl(p.githubUrl ?? "");
+      setPortfolioUrl(p.portfolioUrl ?? "");
+      setXUrl(p.XUrl ?? "");
+      setSkills(p.skills ?? []);
+      setEducation(p.education ?? []);
+      setAchievements(p.achievements ?? []);
+      setHasPassword(freshData.hasPassword);
     }
+  }, [freshData]);
 
-    fetchProfile();
-  }, []);
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const cleanedSkills = skills.map((s) => s.trim()).filter(Boolean);
-
-    try {
+  const { mutate: updateProfile, isPending: loading } = useMutation({
+    mutationFn: async () => {
+      const cleanedSkills = skills.map((s) => s.trim()).filter(Boolean);
       const res = await fetch("/api/profile/update", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          headline: headline || null,
-          organization: organization || null,
-          locationCity: locationCity || null,
-          locationCountry: locationCountry || null,
-          about: about || null,
-
-          linkedinUrl: linkedinUrl || null,
-          githubUrl: githubUrl || null,
-          portfolioUrl: portfolioUrl || null,
-          XUrl: XUrl || null,
-
+          headline,
+          organization,
+          locationCity,
+          locationCountry,
+          about,
+          linkedinUrl,
+          githubUrl,
+          portfolioUrl,
+          XUrl,
           skills: cleanedSkills,
-
           education,
           achievements,
         }),
       });
-
       if (!res.ok) throw new Error();
-
+      return res.json();
+    },
+    onSuccess: () => {
       toast.success("Profile updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["profile", session?.user.slug],
+      });
+      queryClient.invalidateQueries({ queryKey: ["navbar-user"] });
+      queryClient.invalidateQueries({ queryKey: ["profile-update-data"] });
       router.push(`/main/profile/${session?.user.slug}`);
-    } catch {
-      toast.error("Failed to update profile");
-    } finally {
-      setLoading(false);
-    }
+    },
+    onError: () => toast.error("Failed to update profile"),
+  });
+
+  const handleUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfile();
   };
 
   function handleSetPassword() {
     router.push("/auth/forgot-password?set-password=true");
   }
 
-  if (initialLoading) {
+  if (initialLoading && !cachedData) {
     return <ProfileSettingsSkeleton />;
   }
+
   return (
     <>
       <form
@@ -168,29 +176,24 @@ export default function SettingsPage() {
         <Section title="Profile">
           <div className="space-y-4 sm:space-y-5">
             <Input label="Name" value={name} onChange={setName} />
-
             <Input label="Headline" value={headline} onChange={setHeadline} />
-
             <Input
               label="Organization"
               value={organization}
               onChange={setOrganization}
             />
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <Input
                 label="City"
                 value={locationCity}
                 onChange={setLocationCity}
               />
-
               <Input
                 label="Country"
                 value={locationCountry}
                 onChange={setLocationCountry}
               />
             </div>
-
             <Textarea label="About" value={about} onChange={setAbout} />
           </div>
         </Section>
@@ -202,11 +205,8 @@ export default function SettingsPage() {
               value={linkedinUrl}
               onChange={setLinkedInUrl}
             />
-
             <Input label="GitHub" value={githubUrl} onChange={setGithubUrl} />
-
             <Input label="X" value={XUrl} onChange={setXUrl} />
-
             <Input
               label="Portfolio"
               value={portfolioUrl}
@@ -240,7 +240,6 @@ export default function SettingsPage() {
                     setEducation(newEdu);
                   }}
                 />
-
                 <Input
                   label="Degree"
                   value={edu.degree ?? ""}
@@ -250,7 +249,6 @@ export default function SettingsPage() {
                     setEducation(newEdu);
                   }}
                 />
-
                 <Input
                   label="Field of Study"
                   value={edu.fieldOfStudy ?? ""}
@@ -260,7 +258,6 @@ export default function SettingsPage() {
                     setEducation(newEdu);
                   }}
                 />
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Start Year"
@@ -271,7 +268,6 @@ export default function SettingsPage() {
                       setEducation(newEdu);
                     }}
                   />
-
                   <Input
                     label="End Year"
                     value={edu.endYear ?? ""}
@@ -282,7 +278,6 @@ export default function SettingsPage() {
                     }}
                   />
                 </div>
-
                 <Input
                   label="Grade"
                   value={edu.grade ?? ""}
@@ -292,7 +287,6 @@ export default function SettingsPage() {
                     setEducation(newEdu);
                   }}
                 />
-
                 <Textarea
                   label="Description"
                   value={edu.description ?? ""}
@@ -323,7 +317,6 @@ export default function SettingsPage() {
                     setAchievements(newAch);
                   }}
                 />
-
                 <Input
                   label="Issuer"
                   value={ach.issuer ?? ""}
@@ -333,7 +326,6 @@ export default function SettingsPage() {
                     setAchievements(newAch);
                   }}
                 />
-
                 <Input
                   label="Category"
                   value={ach.category ?? ""}
@@ -343,7 +335,6 @@ export default function SettingsPage() {
                     setAchievements(newAch);
                   }}
                 />
-
                 <Textarea
                   label="Description"
                   value={ach.description ?? ""}
@@ -353,7 +344,6 @@ export default function SettingsPage() {
                     setAchievements(newAch);
                   }}
                 />
-
                 <Input
                   label="Proof URL"
                   value={ach.proofUrl ?? ""}
@@ -376,31 +366,22 @@ export default function SettingsPage() {
         </button>
 
         <Section title="Security">
-          <div
-            className="flex flex-col sm:flex-row
-      items-start sm:items-center
-      justify-between gap-4 sm:gap-6"
-          >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
             <div className="space-y-1">
               <p className="text-sm font-medium">
                 {hasPassword ? "Password" : "Set up a password"}
               </p>
-
               <p className="text-sm text-white/60 max-w-md">
                 {hasPassword
                   ? "Change your account password to keep your account secure."
                   : "You signed up using OAuth. Set a password to enable email & password login."}
               </p>
             </div>
-
             {hasPassword ? (
               <button
                 type="button"
                 onClick={() => setOpenPasswordModal(true)}
-                className="w-full sm:w-auto
-          px-4 py-2 text-sm rounded-lg border border-white/15
-          hover:border-red-400/60 hover:text-red-300
-          transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 text-sm rounded-lg border border-white/15 hover:border-red-400/60 hover:text-red-300 transition-colors cursor-pointer"
               >
                 Change password
               </button>
@@ -408,10 +389,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={handleSetPassword}
-                className="w-full sm:w-auto
-          px-4 py-2 text-sm rounded-lg
-          bg-teal-500/10 text-teal-300
-          hover:bg-teal-500/20 transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 text-sm rounded-lg bg-teal-500/10 text-teal-300 hover:bg-teal-500/20 transition-colors cursor-pointer"
               >
                 Set password
               </button>
@@ -427,7 +405,6 @@ export default function SettingsPage() {
     </>
   );
 }
-
 
 function Section({
   title,

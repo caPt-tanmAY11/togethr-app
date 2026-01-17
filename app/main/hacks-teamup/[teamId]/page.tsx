@@ -4,9 +4,10 @@ import JoinTeamModal from "@/components/join-team-modal";
 import { authClient } from "@/lib/auth-client";
 import { AnimatePresence, motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import HackTeamDetailsSkeleton from "@/components/skeletons/hack-team-details-skeleton";
 import TeamMembers from "@/components/team-members-list";
 import ConfirmHackTeamActionModal from "@/components/confirm-hackteam-action-modal";
@@ -68,279 +69,179 @@ interface HackTeamData {
 
 export default function HackTeamDetailsPage() {
   const { teamId } = useParams();
-
-  const { data: session } = authClient.useSession();
-
-  const [team, setTeam] = useState<HackTeamData>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  const [isJoining, setIsJoining] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: session } = authClient.useSession();
 
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
+  const {
+    data: team,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["hack-team", teamId],
+    queryFn: async () => {
+      const res = await fetch(`/api/hack-team/${teamId}`);
+      const data = await res.json();
 
-    async function fetchTeam() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await fetch(`/api/hack-team/${teamId}`, { signal });
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const data: {
-          success: boolean;
-          team?: HackTeamData;
-          error?: string;
-        } = await res.json();
-
-        if (!data.success) {
-          throw new Error(data.error || "Failed to fetch team details");
-        }
-
-        if (!data.team) {
-          throw new Error("Team data is empty");
-        }
-
-        setTeam(data.team);
-      } catch (err: unknown) {
-        if (err instanceof DOMException && err.name === "AbortError") {
-          console.log("Fetch aborted");
-        } else if (err instanceof Error) {
-          console.error("Fetch team error:", err.message);
-          setError(err.message);
-        } else {
-          console.error("Unknown fetch error:", err);
-          setError("Could not load team details");
-        }
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        if (res.status === 401)
+          throw new Error("You must be logged in to view this team.");
+        if (res.status === 404) throw new Error("Hack team not found.");
+        if (res.status === 400)
+          throw new Error(data.error || "Invalid request.");
+        throw new Error("Something went wrong. Please try again.");
       }
-    }
+      if (!data.success) throw new Error(data.error || "Failed to fetch");
+      return data.team as HackTeamData;
+    },
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
 
-    fetchTeam();
+  const { mutate: updateRequestStatus, isPending: isUpdatingStatus } =
+    useMutation({
+      mutationFn: async ({
+        requestId,
+        action,
+      }: {
+        requestId: string;
+        action: "ACCEPTED" | "REJECTED";
+      }) => {
+        const res = await fetch(`/api/hack-team-requests/status/${requestId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: action }),
+        });
+        const resData = await res.json();
+        if (!res.ok || !resData.success)
+          throw new Error(resData.error || "Failed to update");
+        return resData;
+      },
+      onSuccess: async (_, variables) => {
+        toast.success(
+          `Request ${variables.action.toLowerCase()} successfully!`
+        );
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["hack-team", teamId] }),
+          queryClient.invalidateQueries({ queryKey: ["hack-teams"] }),
+        ]);
+      },
+      onError: (err: Error) => toast.error(err.message),
+    });
 
-    return () => controller.abort();
-  }, [teamId]);
-
-  const requests = team?.Request || [];
-
-  async function sendJoinRequest(data: {
-    message: string;
-    githubURL: string;
-    linkedinURL: string;
-  }) {
-    if (isJoining) return;
-
-    setIsJoining(true);
-
-    try {
+  const { mutate: sendJoinRequest, isPending: isJoining } = useMutation({
+    mutationFn: async (formData: {
+      message: string;
+      githubURL: string;
+      linkedinURL: string;
+    }) => {
+      if (!team?.teamId) throw new Error("Team ID is missing");
       const res = await fetch(`/api/hack-team-requests/${teamId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-
-      const resData = await res.json();
-
-      if (!resData.success) {
-        toast.error(resData.error || "Failed to send join request");
-        console.error("API Error:", resData.error);
-        return;
-      }
-
-      toast.success(resData.message || "Request sent successfully!");
+      const data = await res.json();
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Failed to send request");
+      return data;
+    },
+    onSuccess: async (data) => {
+      toast.success(data.message || "Request sent successfully!");
+      await queryClient.invalidateQueries({ queryKey: ["hack-team", teamId] });
       router.replace("/main/hacks-teamup");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
 
-      setTeam((prev) => {
-        if (!prev || !session?.user) return prev;
-
-        return {
-          ...prev,
-          Request: [
-            ...prev.Request,
-            {
-              id: resData.request.id,
-              status: "PENDING",
-              message: data.message,
-              type: "JOIN",
-              githubURL: data.githubURL,
-              linkedinURL: data.linkedinURL,
-              sender: {
-                id: session.user.id,
-                name: session.user.name,
-                email: session.user.email ?? "",
-                phone: "",
-                image: session.user.image ?? "",
-                slug: session.user.slug ?? "",
-                trustPoints: session.user.trustPoints ?? 0,
-              },
-            },
-          ],
-        };
-      });
-    } catch (error) {
-      console.error("Error sending request:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsJoining(false);
-    }
-  }
-
-  async function handleRequestAction(
-    requestId: string,
-    action: "ACCEPTED" | "REJECTED"
-  ) {
-    try {
-      const res = await fetch(`/api/hack-team-requests/status/${requestId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: action }),
-      });
-
-      const resData = await res.json();
-
-      if (!res.ok || !resData.success) {
-        const errorMsg = resData.error || "Failed to update request status";
-        toast.error(errorMsg);
-        console.error("Request update error:", errorMsg);
-        return;
-      }
-
-      toast.success(
-        resData.message || `Request ${action.toLowerCase()} successfully!`
-      );
-
-      console.log(resData);
-
-      setTeam((prev) => {
-        if (!prev) return prev;
-
-        const acceptedRequest = prev.Request.find((r) => r.id === requestId);
-
-        if (!acceptedRequest) return prev;
-
-        return {
-          ...prev,
-          spotsLeft:
-            action === "ACCEPTED" ? prev.spotsLeft - 1 : prev.spotsLeft,
-
-          members:
-            action === "ACCEPTED"
-              ? [
-                  ...prev.members,
-                  {
-                    role: "MEMBER",
-                    name: acceptedRequest.sender.name,
-                    user: {
-                      id: acceptedRequest.sender.id,
-                      name: acceptedRequest.sender.name,
-                      image: acceptedRequest.sender.image ?? null,
-                      slug: acceptedRequest.sender.slug ?? null,
-                    },
-                  },
-                ]
-              : prev.members,
-
-          Request: prev.Request.map((r) =>
-            r.id === requestId ? { ...r, status: action } : r
-          ),
-        };
-      });
-    } catch (error) {
-      console.error("[HANDLE_REQUEST_ACTION_ERROR]", error);
-      toast.error("Something went wrong while updating the request!");
-    }
-  }
-
-  async function handleCompleteTeam() {
-    try {
-      setActionLoading(true);
-
+  const { mutate: completeTeamMutation } = useMutation({
+    mutationFn: async () => {
+      if (!team?.teamId) throw new Error("Team ID is missing");
       const res = await fetch(`/api/hack-team/${team?.teamId}/complete`, {
         method: "PATCH",
       });
-
       const data = await res.json();
-
       if (!res.ok || !data.success) {
-        toast.error(data.error || "Failed to complete team");
-        return;
+        if (res.status === 401)
+          throw new Error("You must be logged in to perform this action.");
+        if (res.status === 403)
+          throw new Error("Only the team leader can complete the team.");
+        if (res.status === 400)
+          throw new Error(data.error || "Team cannot be completed.");
+        if (res.status === 404) throw new Error("Team not found.");
+        throw new Error("Something went wrong. Please try again.");
       }
-
+      return data;
+    },
+    onSuccess: async () => {
       toast.success("Team marked as completed 🎉");
-
-      setTeam((prev) => (prev ? { ...prev, status: "COMPLETED" } : prev));
-      setShowCompleteModal(false);
+      await queryClient.invalidateQueries({ queryKey: ["hack-teams"] });
       router.replace("/main/hacks-teamup");
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong");
-    } finally {
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
       setActionLoading(false);
-    }
-  }
+    },
+  });
 
-  async function handleCancelTeam() {
-    try {
-      setActionLoading(true);
-
+  const { mutate: cancelTeamMutation } = useMutation({
+    mutationFn: async () => {
+      if (!team?.teamId) throw new Error("Team ID is missing");
       const res = await fetch(`/api/hack-team/${team?.teamId}/cancel`, {
         method: "PATCH",
       });
-
       const data = await res.json();
-
       if (!res.ok || !data.success) {
-        toast.error(data.error || "Failed to cancel team");
-        return;
+        if (res.status === 401)
+          throw new Error("You must be logged in to perform this action.");
+        if (res.status === 403)
+          throw new Error("Only the team leader can cancel the team.");
+        if (res.status === 400)
+          throw new Error(data.error || "Team cannot be cancelled.");
+        if (res.status === 404) throw new Error("Team not found.");
+        throw new Error("Something went wrong. Please try again.");
       }
-
+      return data;
+    },
+    onSuccess: async () => {
       toast.success("Team cancelled");
+      await queryClient.invalidateQueries({ queryKey: ["hack-teams"] });
       router.replace("/main/hacks-teamup");
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong");
-    } finally {
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
       setActionLoading(false);
-      setShowCancelModal(false);
-    }
-  }
+    },
+  });
 
-  if (error) {
-    return <p className="text-red-400">{error}</p>;
-  }
+  const handleCompleteTeam = () => {
+    setActionLoading(true);
+    completeTeamMutation();
+  };
 
-  if (!team) return <HackTeamDetailsSkeleton />;
+  const handleCancelTeam = () => {
+    setActionLoading(true);
+    cancelTeamMutation();
+  };
+
+  if (error)
+    return <p className="text-red-400 p-10">{(error as Error).message}</p>;
+  if (isLoading || !team) return <HackTeamDetailsSkeleton />;
 
   const currentUserId = session?.user?.id;
-
   const isTeamLeader = currentUserId === team?.createdBy.id;
-
-  const isTeamMember = team?.members.some(
-    (member) => member.user.id === currentUserId
-  );
-
+  const isTeamMember = team?.members.some((m) => m.user.id === currentUserId);
   const userJoinRequest = team?.Request.find(
     (req) => req.sender.id === currentUserId
   );
-
   const hasPendingRequest = userJoinRequest?.status === "PENDING";
+  const requests = team?.Request || [];
 
   return (
     <>
@@ -360,23 +261,20 @@ export default function HackTeamDetailsPage() {
                       "/upload/",
                       "/upload/c_fill,w_240,h_240/"
                     )}
-                    alt={`${team.name} logo`}
+                    alt={team.name}
                     width={240}
                     height={240}
                     className="object-cover h-full w-full"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-[#cfcfcf]">
-                    IMG
-                  </div>
+                  <div className="text-sm text-[#cfcfcf]">IMG</div>
                 )}
               </div>
-
               <div className="text-center">
                 <h1 className="text-3xl font-semibold text-white/90">
                   {team?.name}
                 </h1>
-                <p className="text-lg text-[#a9a9a9]">Mumbai, India</p>
+                <p className="text-lg text-[#a9a9a9]">{team?.origin}</p>
               </div>
             </div>
           </motion.div>
@@ -396,14 +294,11 @@ export default function HackTeamDetailsPage() {
                   <span className="text-[#4ff1f1]">{team?.spotsLeft}</span>
                 </p>
               </div>
-
               <div>
                 <h2 className="text-lg font-semibold">About Team</h2>
                 <p className="text-sm text-[#bdbdbd] mt-1">{team?.teamDesc}</p>
               </div>
-
               <TeamMembers members={team.members} />
-
               <div>
                 <h2 className="text-lg font-semibold">Skill Stack</h2>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -435,10 +330,9 @@ export default function HackTeamDetailsPage() {
                   {team?.hackName}
                 </h2>
               </div>
-
-              <div className="space-y-3 text-sm leading-relaxed text-[#dcdcdc]">
-                <p>{team?.hackDesc}</p>
-              </div>
+              <p className="text-sm leading-relaxed text-[#dcdcdc]">
+                {team?.hackDesc}
+              </p>
 
               <div className="text-sm">
                 <p className="font-semibold">
@@ -450,33 +344,29 @@ export default function HackTeamDetailsPage() {
               </div>
 
               <div className="flex flex-col gap-2 text-sm bg-white/10 p-4 rounded-md">
-                <div className="flex gap-2">
-                  <span className="font-semibold text-white">Begins:</span>
-                  <span>
-                    {team?.hackBegins
-                      ? new Date(team.hackBegins).toLocaleString()
-                      : "N/A"}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="font-semibold text-white">Ends:</span>
-                  <span>
-                    {team?.hackBegins
-                      ? new Date(team.hackEnds).toLocaleString()
-                      : "N/A"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="text-sm">
-                <p className="font-semibold">
-                  Event Link:{" "}
-                  <span className="text-[#4ff1f1] hover:underline cursor-pointer">
-                    {team.hackLink}
-                  </span>
+                <p>
+                  <strong>Begins:</strong>{" "}
+                  {team?.hackBegins
+                    ? new Date(team.hackBegins).toLocaleString()
+                    : "N/A"}
+                </p>
+                <p>
+                  <strong>Ends:</strong>{" "}
+                  {team?.hackEnds
+                    ? new Date(team.hackEnds).toLocaleString()
+                    : "N/A"}
                 </p>
               </div>
-
+              <p className="text-sm font-semibold">
+                Event Link:{" "}
+                <a
+                  href={team.hackLink}
+                  target="_blank"
+                  className="text-[#4ff1f1] hover:underline"
+                >
+                  {team.hackLink}
+                </a>
+              </p>
               <div className="bg-white/10 p-4 rounded-md text-sm">
                 <p className="font-semibold mb-1">Location:</p>
                 <p className="text-[#ffffff78]">{team.hackLocation}</p>
@@ -485,7 +375,7 @@ export default function HackTeamDetailsPage() {
           </motion.div>
 
           <motion.div
-            className="p-5 sm:p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white flex flex-col gap-4 sm:gap-6 max-w-full overflow-x-auto"
+            className="p-5 sm:p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white flex flex-col gap-4"
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -502,8 +392,9 @@ export default function HackTeamDetailsPage() {
                       Pending Requests
                     </h3>
                     <div className="flex flex-col gap-2 sm:gap-3">
-                      {team?.Request.filter((r) => r.status === "PENDING").map(
-                        (req) => (
+                      {requests
+                        .filter((r) => r.status === "PENDING")
+                        .map((req) => (
                           <div
                             key={req.id}
                             className="border border-white/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 hover:bg-white/5 transition"
@@ -551,36 +442,40 @@ export default function HackTeamDetailsPage() {
 
                             <div className="flex flex-wrap gap-2 shrink-0 mt-2 sm:mt-0">
                               <button
-                                onClick={() =>
-                                  handleRequestAction(req.id, "ACCEPTED")
+                                disabled={
+                                  isUpdatingStatus ||
+                                  (team?.spotsLeft ?? 0) <= 0
                                 }
-                                className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium cursor-pointer ${
-                                  team.spotsLeft <= 0
-                                    ? "bg-gray-600 cursor-not-allowed"
+                                onClick={() =>
+                                  updateRequestStatus({
+                                    requestId: req.id,
+                                    action: "ACCEPTED",
+                                  })
+                                }
+                                className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium cursor-pointer transition ${
+                                  (team?.spotsLeft ?? 0) <= 0
+                                    ? "bg-gray-600 cursor-not-allowed opacity-50"
                                     : "bg-green-700 hover:bg-green-600"
                                 }`}
-                                disabled={team.spotsLeft <= 0}
                               >
-                                Accept
+                                {isUpdatingStatus ? "..." : "Accept"}
                               </button>
 
                               <button
+                                disabled={isUpdatingStatus}
                                 onClick={() =>
-                                  handleRequestAction(req.id, "REJECTED")
+                                  updateRequestStatus({
+                                    requestId: req.id,
+                                    action: "REJECTED",
+                                  })
                                 }
-                                className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium cursor-pointer ${
-                                  team.spotsLeft <= 0
-                                    ? "bg-gray-600 cursor-not-allowed"
-                                    : "bg-[#b62222b7] hover:bg-[#e24040b7]"
-                                }`}
-                                disabled={team.spotsLeft <= 0}
+                                className="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium cursor-pointer bg-[#b62222b7] hover:bg-[#e24040b7] transition"
                               >
-                                Reject
+                                {isUpdatingStatus ? "..." : "Reject"}
                               </button>
                             </div>
                           </div>
-                        )
-                      )}
+                        ))}
                     </div>
 
                     {team && team.spotsLeft <= 0 && (
@@ -590,47 +485,21 @@ export default function HackTeamDetailsPage() {
                     )}
                   </>
                 ) : (
-                  <p className="text-xs sm:text-sm text-[#bdbdbd]">
-                    No pending requests
-                  </p>
-                )}
-
-                {requests.filter((r) => r.status === "ACCEPTED").length > 0 && (
-                  <>
-                    <h3 className="font-medium text-sm sm:text-base text-[#4ff1f1] mt-4 mb-1">
-                      Accepted Members
-                    </h3>
-                    <div className="flex flex-col gap-1 sm:gap-2">
-                      {team?.Request.filter((r) => r.status === "ACCEPTED").map(
-                        (req) => (
-                          <div
-                            key={req.id}
-                            className="border-b border-white/20 px-3 sm:px-4 py-1 sm:py-2"
-                          >
-                            <p className="text-xs sm:text-sm">
-                              <strong>{req.sender.name}</strong> has joined
-                            </p>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </>
+                  <p className="text-sm text-[#bdbdbd]">No pending requests</p>
                 )}
               </div>
             ) : (
-              <div className="space-y-2 sm:space-y-3 bg-white/10 p-3 sm:p-4 rounded-md text-center">
+              <div className="bg-white/10 p-4 rounded-md">
                 {isTeamMember ? (
-                  <p className="text-green-400 font-semibold text-sm sm:text-base">
+                  <p className="text-green-400 font-semibold">
                     You are already a team member
                   </p>
                 ) : hasPendingRequest ? (
-                  <p className="text-yellow-400 font-semibold text-sm sm:text-base">
-                    ⏳ Waiting for approval
+                  <p className="text-yellow-400 font-semibold">
+                    ⏳ Request Pending
                   </p>
                 ) : team.spotsLeft <= 0 ? (
-                  <p className="text-red-400 font-semibold text-sm sm:text-base">
-                    Team is full! Cannot join.
-                  </p>
+                  <p className="text-red-400 font-semibold">Team is full!</p>
                 ) : (
                   <>
                     <div className="flex flex-col gap-4">
@@ -647,7 +516,7 @@ export default function HackTeamDetailsPage() {
                           className={`w-full rounded-xl px-8 py-2 font-medium shadow-md transition-all cursor-pointer
                     ${
                       isJoining
-                        ? "bg-[#0d6969]/70 cursor-not-allowed"
+                        ? "bg-[#0d6969]/70 cursor-not-allowed opacity-60"
                         : "bg-[#0d6969] hover:bg-[#118585]"
                     }`}
                         >
@@ -678,10 +547,17 @@ export default function HackTeamDetailsPage() {
                       </div>
                     </div>
                   </>
+
+                  // <button
+                  //   disabled={isJoining}
+                  //   onClick={() => setIsJoinModalOpen(true)}
+                  //   className="w-full bg-[#0d6969] rounded-xl py-2 font-medium hover:bg-[#118585] transition-all"
+                  // >
+                  //   {isJoining ? "Sending..." : "Join Team"}
+                  // </button>
                 )}
               </div>
             )}
-
             <div className="flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm mt-3 sm:mt-4">
               <h2 className="font-semibold text-sm sm:text-lg">Contact</h2>
               {team.teamLeadPhoneNo ? <p>📞 {team.teamLeadPhoneNo}</p> : ""}
@@ -691,24 +567,21 @@ export default function HackTeamDetailsPage() {
 
           {isTeamLeader && (
             <motion.div
-              className="p-7 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg text-white"
+              className="p-7 rounded-2xl bg-white/5 border border-white/10 shadow-lg text-white"
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
             >
               <h2 className="text-lg font-bold mb-4">Team Actions</h2>
-
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setShowCompleteModal(true)}
-                  className="w-full bg-green-700 hover:bg-green-600 px-6 py-2 rounded-lg font-medium transition-all shadow-md cursor-pointer"
+                  className="w-full bg-green-700 hover:bg-green-600 px-6 py-2 rounded-lg font-medium cursor-pointer"
                 >
-                  Mark Team as Completed
+                  Complete Team
                 </button>
-
                 <button
                   onClick={() => setShowCancelModal(true)}
-                  className="w-full bg-[#b62222b7] hover:bg-[#e24040b7] px-6 py-2 rounded-lg font-medium transition-all shadow-md cursor-pointer"
+                  className="w-full bg-red-800 hover:bg-red-700 px-6 py-2 rounded-lg font-medium cursor-pointer"
                 >
                   Cancel Team
                 </button>
@@ -725,38 +598,33 @@ export default function HackTeamDetailsPage() {
       <ConfirmHackTeamActionModal
         open={showCompleteModal}
         title="Complete Team?"
-        description="This will mark the team as completed and award trust points to members. This action cannot be undone."
+        description="Mark team as completed and award points."
         confirmText="Yes, Complete"
         confirmColor="green"
         loading={actionLoading}
         onClose={() => setShowCompleteModal(false)}
         onConfirm={handleCompleteTeam}
       />
-
       <ConfirmHackTeamActionModal
         open={showCancelModal}
         title="Cancel Team?"
-        description="This will permanently cancel the team. Members will not receive trust points."
-        confirmText="Yes, Cancel Team"
+        description="This action is permanent."
+        confirmText="Yes, Cancel"
         confirmColor="red"
         loading={actionLoading}
         onClose={() => setShowCancelModal(false)}
         onConfirm={handleCancelTeam}
       />
-
       <JoinTeamModal
         open={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
         type="hack-team"
         onSubmit={(data) => {
-          const payload = {
+          sendJoinRequest({
             message: data.message,
             githubURL: data.githubUrl,
             linkedinURL: data.linkedinUrl,
-          };
-
-          sendJoinRequest(payload);
-
+          });
           setIsJoinModalOpen(false);
         }}
       />

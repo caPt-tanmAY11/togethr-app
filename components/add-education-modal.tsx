@@ -139,7 +139,7 @@ export default function AddEducationModal({
                     </button>
 
                     <button
-                      disabled={loading}
+                      disabled={loading || !form.institution.trim() || !form.startYear?.trim() || !form.endYear?.trim()}
                       onClick={handleSubmit}
                       className="px-5 py-2 rounded-xl bg-[#0d6969] hover:bg-[#118585]
                            text-[white] font-medium text-sm sm:text-base

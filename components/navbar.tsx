@@ -10,6 +10,7 @@ import { UserAvatar } from "./use-avatar";
 import { MessageSquare } from "lucide-react";
 import { useFeedback } from "@/components/feeback/feedback-context";
 import { createPortal } from "react-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -18,14 +19,30 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [signoutModalOpen, setSignoutModalOpen] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending: isSessionPending } =
+    authClient.useSession();
+
+  const { data: userData, isLoading: isUserLoading } = useQuery({
+    queryKey: ["navbar-user"],
+    queryFn: async () => {
+      const res = await fetch("/api/navbar");
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.user; // returns { name, email, image, slug }
+    },
+    // Only fetch if Better Auth says we have a session
+    enabled: !!session,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isAuthenticated = !!session;
-  const user = session?.user;
+  const user = userData || session?.user;
   const slug = user?.slug;
 
   const { openFeedback } = useFeedback();
@@ -69,6 +86,7 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    queryClient.clear(); // Wipes the "navbar-user" cache immediately
     setSignoutModalOpen(false);
     router.push("/auth/signin");
   };
@@ -169,7 +187,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          {!isPending && isAuthenticated && (
+          {!isSessionPending && isAuthenticated && (
             <button
               onClick={openFeedback}
               className="flex items-center gap-2
@@ -182,7 +200,7 @@ export default function Navbar() {
             </button>
           )}
 
-          {!isPending &&
+          {!isSessionPending &&
             (isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -426,7 +444,7 @@ export default function Navbar() {
                   </motion.div>
                 )}
 
-                {!isPending && isAuthenticated && (
+                {!isSessionPending && isAuthenticated && (
                   <>
                     <motion.button
                       whileTap={{ scale: 0.97 }}
@@ -450,7 +468,7 @@ export default function Navbar() {
                 className="mt-auto pt-10 border-t border-white/10
         flex flex-col gap-5"
               >
-                {!isPending &&
+                {!isSessionPending &&
                   (isAuthenticated ? (
                     <>
                       <motion.button

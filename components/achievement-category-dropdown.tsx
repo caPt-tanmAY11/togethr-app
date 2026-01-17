@@ -39,14 +39,14 @@ export default function AchievementCategoryDropdown({
           text-sm transition-all
           hover:bg-white/15
           focus:ring-1 focus:ring-teal-400
-          ${value ? "text-white" : "text-white/60"}
+          ${value ? "text-white" : "text-white/40"}
         `}
       >
-        {selectedLabel}
+        <span>{selectedLabel}</span>
 
         <motion.svg
           animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.2 }}
           className="w-4 h-4 text-white/60 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
@@ -63,41 +63,46 @@ export default function AchievementCategoryDropdown({
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18 }}
-            className="
-              absolute bottom-full mb-2 w-full z-30
-              rounded-xl overflow-hidden
-              bg-[#0b0f0f]/90 backdrop-blur-xl
-              border border-white/10 shadow-xl
-            "
-          >
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.value}
-                type="button"
-                onClick={() => {
-                  onChange(cat.value);
-                  setIsOpen(false);
-                }}
-                className={`
-                  w-full text-left px-4 py-2.5
-                  text-sm transition-all
-                  hover:bg-white/10
-                  ${
-                    value === cat.value
-                      ? "text-teal-300 bg-white/5"
-                      : "text-white/80 hover:text-teal-200"
-                  }
-                `}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </motion.div>
+          <>
+            {/* Click away overlay specific to dropdown */}
+            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+            
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.15 }}
+              className="
+                absolute top-full mt-2 w-full z-20
+                rounded-xl overflow-hidden
+                bg-[#1a1a1a] backdrop-blur-xl
+                border border-white/10 shadow-2xl
+              "
+            >
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(cat.value);
+                    setIsOpen(false);
+                  }}
+                  className={`
+                    w-full text-left px-4 py-2.5
+                    text-sm transition-all
+                    hover:bg-teal-500/10
+                    ${
+                      value === cat.value
+                        ? "text-teal-400 bg-teal-500/5"
+                        : "text-white/80 hover:text-teal-200"
+                    }
+                  `}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

@@ -170,6 +170,10 @@ export async function GET(req: NextRequest) {
             ? (projectStageParam as ProjectStage)
             : undefined;
 
+        if (!userId && ["MY_PROJECT", "REQUESTED", "CONTRIBUTING_IN"].includes(scope)) {
+            return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+        }
+
         const whereClause: Prisma.ProjectWhereInput = {
             ...(projectCommitment && { commitment: projectCommitment }),
             ...(projectStage && { stage: projectStage }),

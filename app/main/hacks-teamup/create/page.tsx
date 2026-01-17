@@ -9,13 +9,15 @@ import SkillStackSection from "@/components/skill-stack-section";
 import EventDetailsSection from "@/components/event-details-section";
 import TeamSizeDropdown from "@/components/team-size-dropdown";
 import { isValidEmail } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function CreateHackTeam() {
   const router = useRouter();
 
+  const queryClient = useQueryClient();
+
   const [teamImage, setTeamImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
 
   const teamSizeOptions = [
     { label: "2 Members", value: 2 },
@@ -41,36 +43,8 @@ export default function CreateHackTeam() {
     location: "",
   });
 
-  async function handleCreateTeamFormSubmit(
-    e: React.FormEvent<HTMLFormElement>
-  ) {
-    e.preventDefault();
-    if (isCreating) return;
-
-    setIsCreating(true);
-
-    try {
-      const formData = new FormData(e.target as HTMLFormElement);
-
-      const teamData = {
-        name: String(formData.get("team-name") || "").trim(),
-        origin: {
-          city: String(formData.get("team-origin-city") || "").trim(),
-          country: String(formData.get("team-origin-country") || "").trim(),
-        },
-        size: selectedTeamSize?.value,
-        skillStack: skills,
-        hackDetails: eventDetails,
-        teamLeadPhone: String(formData.get("phone-no") || "").trim(),
-        teamLeadEmail: String(formData.get("email") || "").trim(),
-        teamDesc: String(formData.get("team-desc") || "").trim() || undefined,
-      };
-
-      if (!isValidEmail(teamData.teamLeadEmail)) {
-        toast.error("Please enter a valid email address");
-        return;
-      }
-
+  const createTeamMutation = useMutation({
+    mutationFn: async (teamData: any) => {
       const res = await fetch("/api/hack-team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,79 +52,103 @@ export default function CreateHackTeam() {
       });
 
       const data = await res.json();
+      if (!res.ok || !data.success) throw data;
+      return data;
+    },
 
-      if (!res.ok || !data.success) {
-        if (Array.isArray(data.fields) && data.fields.length > 0) {
-          const field = data.fields[0];
-          switch (field) {
-            case "name":
-              toast.error("Team name is required");
-              break;
-            case "origin.city":
-              toast.error("City is required");
-              break;
-            case "origin.country":
-              toast.error("Country is required");
-              break;
-            case "size":
-              toast.error("Invalid team size");
-              break;
-            case "skillStack":
-              toast.error("Add at least one skill");
-              break;
-            case "hackDetails.name":
-              toast.error("Hackathon name is required");
-              break;
-            case "hackDetails.startTime":
-              toast.error("Hackathon start time is required");
-              break;
-            case "hackDetails.endTime":
-              toast.error("Hackathon end time is required");
-              break;
-            case "hackDetails.location":
-              toast.error("Hackathon location is required");
-              break;
-            case "hackDetails.mode":
-              toast.error("Hackathon mode is required");
-              break;
-            case "teamLeadEmail":
-              toast.error("Team lead email is required");
-              break;
-            default:
-              toast.error(data.error || "Missing or invalid field");
-          }
-        } else {
-          toast.error(data.error || "Failed to create team");
-        }
-        return;
-      }
-
-      const teamId = data.hackTeam.teamId;
-
+    onSuccess: async (data, variables) => {
       if (teamImage) {
         const imageFormData = new FormData();
         imageFormData.append("file", teamImage);
         imageFormData.append("type", "hack-team");
-        imageFormData.append("entityId", teamId);
+        imageFormData.append("entityId", data.hackTeam.teamId);
 
         const uploadRes = await fetch("/api/upload/image", {
           method: "POST",
           body: imageFormData,
         });
 
-        if (!uploadRes.ok) {
-          toast.error("Team created, but image upload failed");
-        }
+        if (!uploadRes.ok) toast.error("Team created, but image upload failed");
       }
 
+      await queryClient.invalidateQueries({
+        queryKey: ["hack-teams"],
+      });
+
       toast.success("Team created successfully!");
-      router.replace("/main/hacks-teamup");
-    } catch (error: unknown) {
-      if (error instanceof Error) toast.error(error.message);
-      else toast.error("Could not create team");
-    } finally {
-      setIsCreating(false);
+      router.push("/main/hacks-teamup");
+    },
+
+    onError: (err: any) => {
+      if (Array.isArray(err.fields) && err.fields.length > 0) {
+        const field = err.fields[0];
+        switch (field) {
+          case "name":
+            toast.error("Team name is required");
+            break;
+          case "origin.city":
+            toast.error("City is required");
+            break;
+          case "origin.country":
+            toast.error("Country is required");
+            break;
+          case "size":
+            toast.error("Invalid team size");
+            break;
+          case "skillStack":
+            toast.error("Add at least one skill");
+            break;
+          case "hackDetails.name":
+            toast.error("Hackathon name is required");
+            break;
+          case "hackDetails.startTime":
+            toast.error("Hackathon start time is required");
+            break;
+          case "hackDetails.endTime":
+            toast.error("Hackathon end time is required");
+            break;
+          case "hackDetails.location":
+            toast.error("Hackathon location is required");
+            break;
+          case "hackDetails.mode":
+            toast.error("Hackathon mode is required");
+            break;
+          case "teamLeadEmail":
+            toast.error("Team lead email is required");
+            break;
+          default:
+            toast.error(err.error || "Failed to create team");
+        }
+      } else toast.error(err.error || "Failed to create team");
+    },
+  });
+
+  async function handleCreateTeamFormSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    const teamData = {
+      name: String(formData.get("team-name") || "").trim(),
+      origin: {
+        city: String(formData.get("team-origin-city") || "").trim(),
+        country: String(formData.get("team-origin-country") || "").trim(),
+      },
+      size: selectedTeamSize?.value,
+      skillStack: skills,
+      hackDetails: eventDetails,
+      teamLeadPhone: String(formData.get("phone-no") || "").trim(),
+      teamLeadEmail: String(formData.get("email") || "").trim(),
+      teamDesc: String(formData.get("team-desc") || "").trim() || undefined,
+    };
+
+    if (!isValidEmail(teamData.teamLeadEmail)) {
+      toast.error("Please enter a valid email address");
+      return;
     }
+
+    createTeamMutation.mutate(teamData);
   }
 
   return (
@@ -300,17 +298,20 @@ export default function CreateHackTeam() {
               <div className="mt-6">
                 <motion.button
                   type="submit"
-                  disabled={isCreating}
+                  disabled={createTeamMutation.isPending}
                   whileTap={{ scale: 0.97 }}
                   className={`w-full rounded-xl px-8 py-2 font-medium shadow-md transition-all cursor-pointer
                     ${
-                      isCreating
+                      createTeamMutation.isPending
                         ? "bg-[#0d6969]/70 cursor-not-allowed"
                         : "bg-[#0d6969] hover:bg-[#118585]"
+                      // isCreating
+                      //   ? "bg-[#0d6969]/70 cursor-not-allowed"
+                      //   : "bg-[#0d6969] hover:bg-[#118585]"
                     }`}
                 >
                   <AnimatePresence mode="wait">
-                    {isCreating ? (
+                    {createTeamMutation.isPending ? (
                       <motion.div
                         key="loading"
                         className="flex items-center justify-center gap-3"

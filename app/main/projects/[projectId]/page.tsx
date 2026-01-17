@@ -5,9 +5,10 @@ import JoinTeamModal from "@/components/join-team-modal";
 import ProjectMembers from "@/components/project-members-list";
 import ProjectDetailsSkeleton from "@/components/skeletons/project-details-skeletons";
 import { authClient } from "@/lib/auth-client";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface ProjectData {
@@ -65,258 +66,153 @@ interface ProjectData {
 export default function ProjectDetailsPage() {
   const { projectId } = useParams();
   const { data: session } = authClient.useSession();
-
+  const queryClient = useQueryClient();
   const router = useRouter();
-
-  const [isJoining, setIsJoining] = useState(false);
-
-  const [project, setProject] = useState<ProjectData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
-  const isReady = !loading && project !== null;
+  const {
+    data: project,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["project", projectId],
+    queryFn: async () => {
+      const res = await fetch(`/api/projects/${projectId}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Failed to fetch");
+      return data.project as ProjectData;
+    },
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function fetchProject() {
-      try {
-        const res = await fetch(`/api/projects/${projectId}`, {
-          signal: controller.signal,
+  const { mutate: updateRequestStatus, isPending: isUpdatingStatus } =
+    useMutation({
+      mutationFn: async ({
+        requestId,
+        action,
+      }: {
+        requestId: string;
+        action: "ACCEPTED" | "REJECTED";
+      }) => {
+        const res = await fetch(`/api/projects-requests/status/${requestId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: action }),
         });
+        const resData = await res.json();
+        if (!res.ok || !resData.success)
+          throw new Error(resData.error || "Failed to update");
+        return resData;
+      },
+      onSuccess: async (_, variables) => {
+        toast.success(
+          `Request ${variables.action.toLowerCase()} successfully!`
+        );
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
+          queryClient.invalidateQueries({ queryKey: ["projects"] }),
+        ]);
+      },
+      onError: (err: Error) => toast.error(err.message),
+    });
 
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.error || "Failed to load project");
-        }
-
-        setProject(data.project);
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          setError(err.message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchProject();
-    return () => controller.abort();
-  }, [projectId]);
-
-  const requests = project?.requests || [];
-
-  async function sendJoinRequest(data: {
-    message: string;
-    githubUrl: string;
-    linkedinUrl: string;
-  }) {
-    if (isJoining) return;
-
-    setIsJoining(true);
-
-    try {
+  const { mutate: sendJoinRequest, isPending: isJoining } = useMutation({
+    mutationFn: async (formData: {
+      message: string;
+      githubUrl: string;
+      linkedinUrl: string;
+    }) => {
       const res = await fetch(`/api/projects-requests/${projectId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-
       const resData = await res.json();
-
-      if (!resData.success) {
-        toast.error(resData.error || "Failed to send join request");
-        console.error("API Error:", resData.error);
-        return;
-      }
-
-      toast.success(resData.message || "Request sent successfully!");
+      if (!resData.success)
+        throw new Error(resData.error || "Failed to send join request");
+      return resData;
+    },
+    onSuccess: async (data) => {
+      toast.success(data.message || "Request sent successfully!");
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
       router.replace("/main/projects");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
 
-      setProject((prev) => {
-        if (!prev || !session?.user) return prev;
-
-        return {
-          ...prev,
-          Request: [
-            ...prev.requests,
-            {
-              id: resData.request.id,
-              status: "PENDING",
-              message: data.message,
-              type: "JOIN",
-              githubURL: data.githubUrl,
-              linkedinURL: data.linkedinUrl,
-              sender: {
-                id: session.user.id,
-                name: session.user.name,
-                email: session.user.email ?? "",
-                phone: "",
-                image: session.user.image ?? "",
-              },
-            },
-          ],
-        };
-      });
-    } catch (error) {
-      console.error("Error sending request:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsJoining(false);
-    }
-  }
-
-  async function handleRequestAction(
-    requestId: string,
-    action: "ACCEPTED" | "REJECTED"
-  ) {
-    try {
-      const res = await fetch(`/api/projects-requests/status/${requestId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: action }),
-      });
-
-      const resData = await res.json();
-
-      if (!res.ok || !resData.success) {
-        const errorMsg = resData.error || "Failed to update request status";
-        toast.error(errorMsg);
-        console.error("Request update error:", errorMsg);
-        return;
-      }
-
-      toast.success(
-        resData.message || `Request ${action.toLowerCase()} successfully!`
-      );
-
-      console.log(resData);
-
-      setProject((prev) => {
-        if (!prev) return prev;
-
-        const acceptedRequest = prev.requests.find((r) => r.id === requestId);
-
-        if (!acceptedRequest) return prev;
-
-        return {
-          ...prev,
-
-          members:
-            action === "ACCEPTED"
-              ? [
-                  ...prev.members,
-                  {
-                    role: "CONTRIBUTOR",
-                    name: acceptedRequest.sender.name,
-                    user: {
-                      id: acceptedRequest.sender.id,
-                      name: acceptedRequest.sender.name,
-                      image: acceptedRequest.sender.image ?? null,
-                      slug: acceptedRequest.sender.slug,
-                    },
-                  },
-                ]
-              : prev.members,
-
-          requests: prev.requests.map((r) =>
-            r.id === requestId ? { ...r, status: action } : r
-          ),
-        };
-      });
-    } catch (error) {
-      console.error("[HANDLE_REQUEST_ACTION_ERROR]", error);
-      toast.error("Something went wrong while updating the request!");
-    }
-  }
-
-  if (!isReady) {
-    return <ProjectDetailsSkeleton />;
-  }
-
-  async function handleCompleteTeam() {
-    try {
-      setActionLoading(true);
-
+  const { mutate: completeProjectMutation } = useMutation({
+    mutationFn: async () => {
       const res = await fetch(`/api/projects/${project?.id}/complete`, {
         method: "PATCH",
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        toast.error(data.error || "Failed to complete team");
-        return;
-      }
-
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Failed to complete");
+      return data;
+    },
+    onSuccess: async () => {
       toast.success("Project marked as completed 🎉");
-
-      setProject((prev) => (prev ? { ...prev, status: "COMPLETED" } : prev));
-      setShowCompleteModal(false);
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
       router.replace("/main/projects");
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong");
-    } finally {
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
       setActionLoading(false);
-    }
-  }
+    },
+  });
 
-  async function handleCancelTeam() {
-    try {
-      setActionLoading(true);
-
+  const { mutate: cancelProjectMutation } = useMutation({
+    mutationFn: async () => {
       const res = await fetch(`/api/projects/${project?.id}/cancel`, {
         method: "PATCH",
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        toast.error(data.error || "Failed to cancel team");
-        return;
-      }
-
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Failed to cancel");
+      return data;
+    },
+    onSuccess: async () => {
       toast.success("Project cancelled");
-
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
       router.replace("/main/projects");
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong");
-    } finally {
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
       setActionLoading(false);
-      setShowCancelModal(false);
-    }
-  }
+    },
+  });
 
-  if (error) {
-    return <p className="text-red-400">{error}</p>;
-  }
+  const handleCompleteTeam = () => {
+    setActionLoading(true);
+    completeProjectMutation();
+  };
+
+  const handleCancelTeam = () => {
+    setActionLoading(true);
+    cancelProjectMutation();
+  };
+
+  if (error)
+    return <p className="text-red-400 p-10">{(error as Error).message}</p>;
+  if (isLoading || !project) return <ProjectDetailsSkeleton />;
 
   const currentUserId = session?.user?.id;
-
   const isProjectOwner = currentUserId === project?.owner.id;
-
   const isProjectContributor = project?.members.some(
-    (member) => member.user.id === currentUserId
+    (m) => m.user.id === currentUserId
   );
-
   const userJoinRequest = project?.requests.find(
     (req) => req.sender.id === currentUserId
   );
-
   const hasPendingRequest = userJoinRequest?.status === "PENDING";
+  const requests = project?.requests || [];
 
   return (
     <>
@@ -335,7 +231,6 @@ export default function ProjectDetailsPage() {
                   {project.stage}
                 </p>
               </div>
-
               <div>
                 <p className="text-[#a5a5a5] font-medium whitespace-pre-line">
                   {project.shortDesc}
@@ -351,18 +246,12 @@ export default function ProjectDetailsPage() {
             transition={{ duration: 1 }}
           >
             <div className="flex flex-col gap-6">
-              <div>
-                <h2 className="text-lg font-semibold">
-                  Contributors:{" "}
-                  <span
-                    className="text-[#f36262] font-semibold border border-white/20 
-              bg-white/10 hover:bg-white/20 px-2 py-1 rounded-full"
-                  >
-                    {project?.currentMembers}
-                  </span>
-                </h2>
-              </div>
-
+              <h2 className="text-lg font-semibold">
+                Contributors:{" "}
+                <span className="text-[#f36262] font-semibold border border-white/20 bg-white/10 px-2 py-1 rounded-full">
+                  {project?.currentMembers}
+                </span>
+              </h2>
               <ProjectMembers members={project.members} />
             </div>
           </motion.div>
@@ -381,7 +270,6 @@ export default function ProjectDetailsPage() {
                   <span className="text-[#f36262]">{project.commitment}</span>
                 </p>
               </div>
-
               {project.extraNote && (
                 <div>
                   <h2 className="font-semibold">Extra Note</h2>
@@ -390,7 +278,6 @@ export default function ProjectDetailsPage() {
                   </p>
                 </div>
               )}
-
               <div>
                 <h2 className="font-semibold">Skill Stack</h2>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -417,18 +304,9 @@ export default function ProjectDetailsPage() {
           >
             <div className="flex flex-col gap-5">
               <h1 className="text-xl font-bold">Project Details</h1>
-
-              {/* <p className="text-sm">
-              Team Size:{" "}
-              <span className="text-[#4ff1f1]">{project.maxMembers}</span>
-            </p> */}
-
-              <div>
-                <p className="text-[#a5a5a5] font-medium whitespace-pre-line">
-                  {project.detailedDesc}
-                </p>
-              </div>
-
+              <p className="text-[#a5a5a5] font-medium whitespace-pre-line">
+                {project.detailedDesc}
+              </p>
               {project.githubURL && (
                 <p className="text-sm">
                   GitHub:{" "}
@@ -441,7 +319,6 @@ export default function ProjectDetailsPage() {
                   </a>
                 </p>
               )}
-
               <div>
                 <p className="font-semibold">Tags</p>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -466,27 +343,27 @@ export default function ProjectDetailsPage() {
           >
             {isProjectOwner ? (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-[#bdbdbd]">
+                <p className="text-xs sm:text-sm text-[#bdbdbd]">
                   You are the project owner
                 </p>
 
                 {requests.filter((r) => r.status === "PENDING").length > 0 ? (
                   <>
-                    <h3 className="font-medium text-[#f36262] mt-2 mb-1">
+                    <h3 className="font-medium text-sm sm:text-base text-[#f36262] mt-2 mb-1">
                       Pending Requests
                     </h3>
-                    <div className="flex flex-col gap-3">
-                      {project?.requests
+                    <div className="flex flex-col gap-2 sm:gap-3">
+                      {requests
                         .filter((r) => r.status === "PENDING")
                         .map((req) => (
                           <div
                             key={req.id}
-                            className="border border-white/20 rounded-lg px-4 py-3 flex justify-between items-start gap-4 hover:bg-white/5 transition"
+                            className="border border-white/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 hover:bg-white/5 transition"
                           >
-                            <div className="flex flex-col gap-1 text-sm">
-                              <div className="flex gap-5 items-center justify-center">
+                            <div className="flex flex-col gap-1 text-sm w-full sm:w-auto">
+                              <div className="flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center">
                                 <p
-                                  className="text-white cursor-pointer"
+                                  className="text-white cursor-pointer text-sm sm:text-base break-words"
                                   onClick={() =>
                                     router.push(
                                       `/main/profile/${req.sender.slug}`
@@ -496,20 +373,17 @@ export default function ProjectDetailsPage() {
                                   <strong>{req.sender.name}</strong> wants to
                                   join
                                 </p>
-                                <p
-                                  className="rounded-lg border border-white/20 
-              bg-white/10 px-2 py-1 text-xs font-semibold text-white backdrop-blur-md 
-              hover:bg-white/20 transition mb-4"
-                                >
+                                <p className="rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-xs font-semibold text-white backdrop-blur-md hover:bg-white/20 transition mt-1 sm:mt-0">
                                   Trust Score:{" "}
                                   <span className="text-[#f36262]">
                                     {req.sender.trustPoints}
                                   </span>
                                 </p>
                               </div>
-
-                              <p className="text-[#bdbdbd]">{req.message}</p>
-                              <div className="flex gap-4 text-[#f59797] text-xs mt-1">
+                              <p className="text-[#bdbdbd] text-xs sm:text-sm break-words">
+                                {req.message}
+                              </p>
+                              <div className="flex flex-wrap gap-2 text-[#f59797] text-xs mt-1">
                                 <a
                                   href={req.githubUrl}
                                   target="_blank"
@@ -527,120 +401,126 @@ export default function ProjectDetailsPage() {
                               </div>
                             </div>
 
-                            <div className="flex gap-2 shrink-0">
+                            <div className="flex flex-wrap gap-2 shrink-0 mt-2 sm:mt-0">
                               <button
-                                onClick={() =>
-                                  handleRequestAction(req.id, "ACCEPTED")
+                                disabled={
+                                  isUpdatingStatus ||
+                                  project.currentMembers >=
+                                    Number(project.maxMembers)
                                 }
-                                className={`px-4 py-1.5 rounded-md text-xs font-medium cursor-pointer bg-green-700 hover:bg-green-600`}
+                                onClick={() =>
+                                  updateRequestStatus({
+                                    requestId: req.id,
+                                    action: "ACCEPTED",
+                                  })
+                                }
+                                className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium cursor-pointer transition ${
+                                  project.currentMembers >=
+                                  Number(project.maxMembers)
+                                    ? "bg-gray-600 cursor-not-allowed opacity-50"
+                                    : "bg-green-700 hover:bg-green-600 text-white"
+                                }`}
                               >
-                                Accept
+                                {isUpdatingStatus ? "..." : "Accept"}
                               </button>
 
                               <button
+                                disabled={isUpdatingStatus}
                                 onClick={() =>
-                                  handleRequestAction(req.id, "REJECTED")
+                                  updateRequestStatus({
+                                    requestId: req.id,
+                                    action: "REJECTED",
+                                  })
                                 }
-                                className={`px-4 py-1.5 rounded-md text-xs font-medium cursor-pointer bg-[#b62222b7] hover:bg-[#e24040b7]`}
+                                className="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium cursor-pointer bg-[#b62222b7] hover:bg-[#e24040b7] text-white transition"
                               >
-                                Reject
+                                {isUpdatingStatus ? "..." : "Reject"}
                               </button>
                             </div>
                           </div>
                         ))}
                     </div>
+
+                    {project &&
+                      project.currentMembers >= Number(project.maxMembers) && (
+                        <p className="text-red-400 mt-2 text-xs sm:text-sm font-medium">
+                          Project is at maximum capacity!
+                        </p>
+                      )}
                   </>
                 ) : (
                   <p className="text-sm text-[#bdbdbd]">No pending requests</p>
-                )}
-
-                {requests.filter((r) => r.status === "ACCEPTED").length > 0 && (
-                  <>
-                    <h3 className="font-medium text-[#f36262] mt-4 mb-1">
-                      Accepted Members
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      {project?.requests
-                        .filter((r) => r.status === "ACCEPTED")
-                        .map((req) => (
-                          <div
-                            key={req.id}
-                            className="border-b border-white/20 px-4 py-2"
-                          >
-                            <p>
-                              <strong>{req.sender.name}</strong> has joined
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-                  </>
                 )}
               </div>
             ) : (
               <div className="space-y-3 bg-white/10 p-4 rounded-md">
                 {isProjectContributor ? (
                   <p className="text-green-400 font-semibold">
-                    You are already a team member
+                    You are already a project member
                   </p>
                 ) : hasPendingRequest ? (
                   <p className="text-yellow-400 font-semibold">
                     ⏳ Waiting for approval
                   </p>
                 ) : (
-                  <>
-                    <div className="flex flex-col gap-4">
-                      <p className="text-sm sm:text-xl font-semibold text-left">
-                        Want to join the project?
-                      </p>
+                  <div className="flex flex-col gap-4">
+                    <p className="text-xl font-semibold">Want to join?</p>
 
-                      <div className="mt-6">
-                        <motion.button
-                          type="submit"
-                          disabled={isJoining}
-                          onClick={() => setIsJoinModalOpen(true)}
-                          whileTap={{ scale: 0.97 }}
-                          className={`w-full rounded-xl px-8 py-2 font-medium shadow-md transition-all cursor-pointer
+                    <div className="mt-6">
+                      <motion.button
+                        type="submit"
+                        disabled={isJoining}
+                        onClick={() => setIsJoinModalOpen(true)}
+                        whileTap={{ scale: 0.97 }}
+                        className={`w-full rounded-xl px-8 py-2 font-medium shadow-md transition-all cursor-pointer
                     ${
                       isJoining
-                        ? "bg-[#c93a3ab7] cursor-not-allowed"
+                        ? "bg-[#f36262b7]/70 cursor-not-allowed opacity-60"
                         : "bg-[#f36262b7] hover:bg-[#fc8e8eb7]"
                     }`}
-                        >
-                          <AnimatePresence mode="wait">
-                            {isJoining ? (
-                              <motion.div
-                                key="loading"
-                                className="flex items-center justify-center gap-3"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                              >
-                                <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                                <span>Sending join request</span>
-                              </motion.div>
-                            ) : (
-                              <motion.span
-                                key="text"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                              >
-                                Join Project
-                              </motion.span>
-                            )}
-                          </AnimatePresence>
-                        </motion.button>
-                      </div>
+                      >
+                        <AnimatePresence mode="wait">
+                          {isJoining ? (
+                            <motion.div
+                              key="loading"
+                              className="flex items-center justify-center gap-3"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                              <span>Sending contribution request...</span>
+                            </motion.div>
+                          ) : (
+                            <motion.span
+                              key="text"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              Join Project
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </motion.button>
                     </div>
-                  </>
+
+                    {/* <motion.button
+                      disabled={isJoining}
+                      onClick={() => setIsJoinModalOpen(true)}
+                      whileTap={{ scale: 0.97 }}
+                      className="w-full rounded-xl bg-[#f36262b7] px-8 py-2 font-medium hover:bg-[#fc8e8eb7] transition-all"
+                    >
+                      {isJoining ? "Sending contribution request..." : "Join Project"}
+                    </motion.button> */}
+                  </div>
                 )}
               </div>
             )}
-
             <div className="flex flex-col gap-2 text-sm mt-4">
               <h2 className="font-semibold text-lg">Contact</h2>
-              {project.contactPhone ? <p>📞 {project.contactPhone}</p> : ""}
-              {project.contactEmail ? <p>📧 {project.contactEmail}</p> : ""}
+              <p>📞 {project.contactPhone || "N/A"}</p>
+              <p>📧 {project.contactEmail || "N/A"}</p>
             </div>
           </motion.div>
 
@@ -652,18 +532,16 @@ export default function ProjectDetailsPage() {
               transition={{ duration: 1 }}
             >
               <h2 className="text-xl font-bold mb-4">Project Actions</h2>
-
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setShowCompleteModal(true)}
-                  className="w-full bg-green-700 hover:bg-green-600 px-6 py-2 rounded-lg font-medium transition-all shadow-md cursor-pointer"
+                  className="w-full bg-green-700 hover:bg-green-600 px-6 py-2 rounded-lg font-medium cursor-pointer"
                 >
-                  Mark Project as Completed
+                  Complete Project
                 </button>
-
                 <button
                   onClick={() => setShowCancelModal(true)}
-                  className="w-full bg-[#b62222b7] hover:bg-[#e24040b7] px-6 py-2 rounded-lg font-medium transition-all shadow-md cursor-pointer"
+                  className="w-full bg-red-800 hover:bg-red-700 px-6 py-2 rounded-lg font-medium cursor-pointer"
                 >
                   Cancel Project
                 </button>
@@ -688,31 +566,22 @@ export default function ProjectDetailsPage() {
         onClose={() => setShowCompleteModal(false)}
         onConfirm={handleCompleteTeam}
       />
-
       <ConfirmProjectActionModal
         open={showCancelModal}
         title="Cancel Project?"
-        description="This will permanently cancel the project. Members will not receive trust points."
-        confirmText="Yes, Cancel Project"
+        description="This action cannot be undone."
+        confirmText="Yes, Cancel"
         confirmColor="red"
         loading={actionLoading}
         onClose={() => setShowCancelModal(false)}
         onConfirm={handleCancelTeam}
       />
-
       <JoinTeamModal
         open={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
         type="project"
         onSubmit={(data) => {
-          const payload = {
-            message: data.message,
-            githubUrl: data.githubUrl,
-            linkedinUrl: data.linkedinUrl,
-          };
-
-          sendJoinRequest(payload);
-
+          sendJoinRequest(data);
           setIsJoinModalOpen(false);
         }}
       />
