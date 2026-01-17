@@ -43,7 +43,7 @@ export default function CreateHackTeam() {
     location: "",
   });
 
-  const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
+  const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
   const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpg"];
 
   const createTeamMutation = useMutation({
@@ -163,7 +163,7 @@ export default function CreateHackTeam() {
       }
 
       if (teamImage.size > MAX_IMAGE_SIZE) {
-        toast.error("Image size must be less than 10 MB");
+        toast.error("Image size must be less than 5 MB");
         return;
       }
     }
@@ -215,7 +215,7 @@ export default function CreateHackTeam() {
                   ) : (
                     <div className="text-center text-white/50">
                       <p className="font-medium">Upload team image</p>
-                      <p className="text-sm mt-1">PNG or JPG • Max 10 MB</p>
+                      <p className="text-sm mt-1">PNG or JPG • Max 5 MB</p>
                     </div>
                   )}
                 </div>
