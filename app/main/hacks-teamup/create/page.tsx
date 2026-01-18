@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -10,6 +10,9 @@ import EventDetailsSection from "@/components/event-details-section";
 import TeamSizeDropdown from "@/components/team-size-dropdown";
 import { isValidEmail } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg"];
 
 export default function CreateHackTeam() {
   const router = useRouter();
@@ -42,9 +45,6 @@ export default function CreateHackTeam() {
     link: "",
     location: "",
   });
-
-  const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
-  const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpg"];
 
   const createTeamMutation = useMutation({
     mutationFn: async (teamData: any) => {
@@ -131,6 +131,14 @@ export default function CreateHackTeam() {
     },
   });
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   async function handleCreateTeamFormSubmit(
     e: React.FormEvent<HTMLFormElement>,
   ) {
@@ -195,11 +203,24 @@ export default function CreateHackTeam() {
               <label className="group cursor-pointer">
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpeg"
                   hidden
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
+
+                    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                      toast.error("Only PNG or JPG images are allowed");
+                      e.target.value = "";
+                      return;
+                    }
+
+                    if (file.size > MAX_IMAGE_SIZE) {
+                      toast.error("Image size must be less than 5 MB");
+                      e.target.value = "";
+                      return;
+                    }
+
                     setTeamImage(file);
                     setPreviewUrl(URL.createObjectURL(file));
                   }}

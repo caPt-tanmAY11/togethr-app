@@ -5,6 +5,9 @@ import prisma from "@/lib/prisma";
 
 type UploadType = "user" | "hack-team";
 
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg"];
+
 export async function POST(req: Request) {
     try {
         const session = await auth.api.getSession({
@@ -24,6 +27,20 @@ export async function POST(req: Request) {
         if (!file || !type || !entityId) {
             return NextResponse.json(
                 { error: "Missing fields" },
+                { status: 400 }
+            );
+        }
+
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            return NextResponse.json(
+                { error: "Invalid file type. Only PNG or JPG allowed." },
+                { status: 400 }
+            );
+        }
+
+        if (file.size > MAX_IMAGE_SIZE) {
+            return NextResponse.json(
+                { error: "Image size must be less than 5 MB." },
                 { status: 400 }
             );
         }

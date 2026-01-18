@@ -70,6 +70,9 @@ const cardBase =
   "bg-linear-to-br from-white/10 via-white/5 to-transparent " +
   "backdrop-blur-2xl p-8 sm:p-10 text-white";
 
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg"];
+
 export default function ProfilePage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
@@ -79,7 +82,7 @@ export default function ProfilePage() {
   const [showImageMenu, setShowImageMenu] = useState(false);
   const [connectionsOpen, setConnectionsOpen] = useState(false);
   const [connectionType, setConnectionType] = useState<ConnectionType | null>(
-    null
+    null,
   );
 
   const {
@@ -113,7 +116,7 @@ export default function ProfilePage() {
     queryFn: async () => {
       if (!profile?.slug || !connectionType) return [];
       const res = await fetch(
-        `/api/profile/connections?type=${connectionType}&slug=${profile?.slug}`
+        `/api/profile/connections?type=${connectionType}&slug=${profile?.slug}`,
       );
       const data = await res.json();
       return (data.users || []) as ConnectionUser[];
@@ -277,30 +280,80 @@ export default function ProfilePage() {
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
-                          className="absolute right-0 mt-2 w-40 rounded-xl bg-black border border-white/10 backdrop-blur-md overflow-hidden z-50"
+                          className="absolute right-0 mt-2 w-50 rounded-xl bg-black border border-white/10 backdrop-blur-md overflow-hidden z-50"
                         >
                           <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full px-4 py-3 text-sm text-left hover:bg-white/10 flex items-center gap-2 cursor-pointer"
+                            onClick={() => {
+                              if (!imageLoading) {
+                                fileInputRef.current?.click();
+                              }
+                            }}
+                            disabled={imageLoading}
+                            className={`w-full px-4 py-3 text-sm text-left flex flex-col items-center justify-center
+                            ${
+                              imageLoading
+                                ? "opacity-50 cursor-not-allowed"
+                                : "hover:bg-white/10 cursor-pointer"
+                            }
+                          `}
                           >
-                            <Upload size={14} /> Update photo
+                            <div className="flex gap-2 items-center">
+                              <Upload size={14} />
+                              <span>
+                                {imageLoading ? "Uploading..." : "Update photo"}
+                              </span>
+                            </div>
+
+                            <p className="mt-1 text-xs text-white/40">
+                              PNG or JPG • Max 5 MB
+                            </p>
                           </button>
+
                           <button
-                            onClick={() => removeImage()}
-                            className="w-full px-4 py-3 text-sm text-left hover:bg-red-500/10 text-red-400 flex items-center gap-2 cursor-pointer"
+                            onClick={() => {
+                              if (!imageLoading) removeImage();
+                            }}
+                            disabled={imageLoading}
+                            className={`w-full px-4 py-3 text-sm text-left flex justify-center items-center gap-2 text-red-400
+                            ${
+                              imageLoading
+                                ? "opacity-50 cursor-not-allowed"
+                                : "hover:bg-red-500/10 cursor-pointer"
+                            }
+                          `}
                           >
-                            <Trash size={14} /> Remove photo
+                            <div className="flex gap-2 items-center justify-center">
+                              <Trash size={14} /> Remove photo
+                            </div>
                           </button>
                         </motion.div>
                       )}
                     </AnimatePresence>
+
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept="image/png,image/jpeg"
                       hidden
                       onChange={(e) => {
                         const file = e.target.files?.[0];
+
+                        if (!file) return;
+
+                        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                          toast.error("Only PNG or JPG images are allowed");
+                          e.target.value = "";
+                          return;
+                        }
+
+                        if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+                          toast.error(
+                            "Image too large. Max allowed size is 5 MB",
+                          );
+                          e.target.value = "";
+                          return;
+                        }
+
                         if (file) updateImage(file);
                       }}
                     />
