@@ -2,48 +2,70 @@
 # togethr-app
 togethr is a platform for students and developers to form trusted hackathon teams, collaborate on projects, and showcase their skills.
 
-🔗 **Live Demo:** https://togethr-psi.vercel.app/  
-📦 **GitHub Repo:** https://github.com/caPt-tanmAY11/togethr-app
+### 🔗 **Live Demo:** https://togethr-psi.vercel.app/  
+### 📦 **GitHub Repo:** https://github.com/caPt-tanmAY11/togethr-app
 
-## ✨ Highlights
+<br/>
 
-- Built with **Next.js App Router** and **TypeScript**
-- Structured team & project collaboration system
-- Trust-based ecosystem to reduce spam and fake profiles
-- Clean, modern UI with smooth animations
-- Optimized UX with cached queries, background refetching, and smooth state transitions
-- Fully authenticated flows with email verification
-- Efficient client-side data fetching and caching with **TanStack Query**
-- Deployed and production-ready on Vercel
+## 🎯 Project Purpose
+
+togethr was built as a portfolio and learning project to solve a real problem faced by students and developers:  
+
+- Difficulty in finding genuine teammates
+- Lack of trust in online collaboration
+- Too much noise and spam on existing platforms
+
+This project focuses on real collaboration, trust, and clean UX, while also showcasing full-stack development skills.
+
+<br/>
 
 ## 🚀 Features
 
-### 👥 Hackathon Team Formation
-- Create hackathon teams with clear details
-- List required skills and available spots
-- Send and manage join requests instead of random DMs
-- Team leads stay in full control
+### 👥 Team Formation & Collaboration
+- Create hackathon teams with clear goals, skills, and available slots
+- Post real project ideas (short-term or long-term)
+- Request to join teams instead of random DMs
+- Team leads approve or reject requests
+- Collaborate beyond hackathons on real projects
 
-### 🤝 Project Collaboration
-- Post real project ideas (long-term or short-term)
-- Accept or reject collaboration requests
-- Build teams beyond hackathons
 
-### 🧠 Trust Score System
-- Trust points are earned through real actions
-- Accepted requests and collaborations increase trust
-- Helps identify serious and reliable builders
+### 🧠 Trust-Based System
+- Trust points earned through real participation
+- Accepted join requests and collaborations increase trust
+- Helps surface serious and reliable builders
 
-### 🧑‍💻 Builder Profiles
-- Build and share clean, developer-focused profiles
+
+### 🧑‍💻 Developer Profiles
+- Clean, developer-first public profiles
 - Showcase skills, projects, achievements, and links
-- Profiles grow with real activity on the platform
+- Profiles grow organically through real activity
+
 
 ### 🔐 Authentication & Security
 - Email & password authentication
 - Email verification and password reset
-- Google and GitHub OAuth support
-- Secure session handling
+- Google and GitHub OAuth
+- Secure session and access handling
+
+<br/>
+
+## 🛠️ Tech Stack
+
+<div align="center">
+
+| Category | Technologies |
+|----------|-------------|
+| **Frontend** | ![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white) ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) ![shadcn/ui](https://img.shields.io/badge/shadcn/ui-000000?style=flat-square&logo=vercel&logoColor=white) |
+| **Backend** | ![Next.js Server Actions](https://img.shields.io/badge/Next.js-Server_Actions-000000?style=flat-square&logo=next.js&logoColor=white) ![API Routes](https://img.shields.io/badge/API_Routes-Next.js-000000?style=flat-square&logo=next.js&logoColor=white) |
+| **Database** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-316192?style=flat-square&logo=postgresql&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white) |
+| **Auth** | ![Better Auth](https://img.shields.io/badge/Better_Auth-Authentication-4F46E5?style=flat-square) ![Google OAuth](https://img.shields.io/badge/Google-OAuth-4285F4?style=flat-square&logo=google&logoColor=white) ![GitHub OAuth](https://img.shields.io/badge/GitHub-OAuth-181717?style=flat-square&logo=github&logoColor=white) |
+| **Data Fetching** | ![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=flat-square&logo=react-query&logoColor=white) |
+| **Media** | ![Cloudinary](https://img.shields.io/badge/Cloudinary-2C39BD?style=flat-square&logo=cloudinary&logoColor=white) |
+| **Deployment** | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) |
+
+</div>
+
+<br/>
 
 ## 📂 Project Structure
 
@@ -56,6 +78,22 @@ togethr-app/
 ├── prisma/ # Prisma schema & client
 ├── public/ # Static assets
 ```
+
+<br/>
+
+## 🧠 Platform Flow
+<div align="center">
+  
+```mermaid 
+graph LR
+
+    A[🔐 Authenticated User] --> B[👥 Join / Create Team]
+    B --> C[🤝 Collaborate on Projects]
+    C --> D[⭐ Earn Trust]
+    D --> E[🚀 Strong Profile]
+```
+</div>
+
 
 ## ⚙️ Getting Started (Local Setup)
 
@@ -121,6 +159,8 @@ npm run dev
 ### 6) Open the app:
 Visit -> http://localhost:3000
 
+<br/>
+
 ## 📸 Screenshots
 
 ### Landing Page
@@ -141,39 +181,7 @@ Visit -> http://localhost:3000
 ### Profile Page
 ![Profile Page](./screenshots/profile.png)
 
-## 🎯 Project Purpose
-togethr was built as a portfolio and learning project to solve a real problem faced by students and developers:  
-
-- Difficulty in finding genuine teammates
-- Lack of trust in online collaboration
-- Too much noise and spam on existing platforms
-
-This project focuses on real collaboration, trust, and clean UX, while also showcasing full-stack development skills.
-
-## 🛠️ Tech Stack
-
-### Language
-- **TypeScript**
-
-### Frontend
-- **Next.js** (App Router)
-- **React**
-- **Tailwind CSS**
-- **shadcn/ui**
-- **Framer Motion**
-- **TanStack Query** (Client-side data fetching & caching)
-
-
-### Backend
-- **Next.js Server Actions & API Routes**
-- **Prisma ORM**
-- **PostgreSQL** (Neon)
-
-### Services & Tools
-- **Better Auth** (Authentication)
-- **Cloudinary** (Image storage)
-- **Nodemailer** (Email service)
-- **Vercel** (Deployment)
+<br/>
 
 ## 🤝 Contributions
 
@@ -186,6 +194,4 @@ This project is intended for educational and showcase purposes only.
 
 ## 👨‍💻 Author
 
-Tanmay Vishwakarma  
-Second Year B.Tech Engineering Student @ SPIT Mumbai  
-Full-Stack Web Developer  
+<div align="center"> <table> <tr> <td align="center"> <img src="https://github.com/caPt-tanmAY11.png" width="140px" style="border-radius:50%;" /> <br/> <b>Tanmay Vishwakarma</b> <br/> <sub>Full-Stack Developer</sub> <br/><br/> <a href="https://github.com/caPt-tanmAY11"> <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github"/> </a> </td> </tr> </table> </div>
