@@ -30,6 +30,7 @@ interface Props {
     stage?: string;
     commitment?: string;
     skills?: string;
+    tags?:string;
   };
 }
 
@@ -37,16 +38,21 @@ export default function ProjectsClient({ initialFilters }: Props) {
   const [isFilterChanging, setIsFilterChanging] = useState(false);
 
   const [projectCommitmentFilter, setProjectCommitmentFilter] = useState(
-    initialFilters.commitment || ""
+    initialFilters.commitment || "",
   );
   const [skills, setSkills] = useState<string[]>(
-    initialFilters.skills?.split(",") || []
+    initialFilters.skills?.split(",") || [],
   );
+
+  const [tags, setTags] = useState<string[]>(
+    initialFilters.tags?.split(",") || [],
+  );
+
   const [projectStageFilter, setProjectStageFilter] = useState(
-    initialFilters.stage || ""
+    initialFilters.stage || "",
   );
   const [scopeFilter, setScopeFilter] = useState<ProjectScope>(
-    (initialFilters.scope as ProjectScope) || "ALL"
+    (initialFilters.scope as ProjectScope) || "ALL",
   );
 
   const [showFilter, setShowFilter] = useState(false);
@@ -197,6 +203,13 @@ export default function ProjectsClient({ initialFilters }: Props) {
                       type="skillstack"
                       section="projects"
                     />
+
+                    <SkillStackSection
+                      section="projects"
+                      elements={tags}
+                      setElements={setTags}
+                      type="tags"
+                    />
                   </div>
 
                   <div className="flex gap-3 mt-8">
@@ -218,7 +231,7 @@ export default function ProjectsClient({ initialFilters }: Props) {
               </>
             )}
           </AnimatePresence>,
-          document.body
+          document.body,
         )
       : null;
 
@@ -233,6 +246,8 @@ export default function ProjectsClient({ initialFilters }: Props) {
     if (projectCommitmentFilter)
       params.set("commitment", projectCommitmentFilter);
     if (skills.length > 0) params.set("skills", skills.join(","));
+
+    if (tags.length > 0) params.set("tags", tags.join(","));
 
     const newQueryString = params.toString();
 
@@ -249,6 +264,7 @@ export default function ProjectsClient({ initialFilters }: Props) {
     setProjectCommitmentFilter("ANY");
     setProjectStageFilter("ANY");
     setSkills([]);
+    setTags([]);
 
     setAppliedQueryString("");
     router.push("/main/projects", { scroll: false });

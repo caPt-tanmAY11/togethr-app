@@ -38,6 +38,7 @@ interface Props {
     teamSize?: string;
     location?: string;
     skills?: string;
+    hackName?: string;
   };
 }
 
@@ -57,23 +58,28 @@ export default function HackTeamUpClient({ initialFilters }: Props) {
   ];
 
   const [scopeFilter, setScopeFilter] = useState<TeamScope>(
-    (initialFilters.scope as TeamScope) || "ALL"
+    (initialFilters.scope as TeamScope) || "ALL",
   );
   const [hackModeFilter, setHackModeFilter] = useState(
-    initialFilters.mode || ""
+    initialFilters.mode || "",
   );
+
+  const [hackNameFilter, setHackNameFilter] = useState(
+    initialFilters.hackName || "",
+  );
+
   const [locationFilter, setLocationFilter] = useState(
-    initialFilters.location || ""
+    initialFilters.location || "",
   );
   const [skills, setSkills] = useState<string[]>(
-    initialFilters.skills?.split(",") || []
+    initialFilters.skills?.split(",") || [],
   );
   const [teamSizeFilter, setSelectedTeamSizeFilter] = useState(
     initialFilters.teamSize
       ? teamSizeOptions.find(
-          (opt) => opt.value === Number(initialFilters.teamSize)
+          (opt) => opt.value === Number(initialFilters.teamSize),
         ) || null
-      : null
+      : null,
   );
 
   const [showFilter, setShowFilter] = useState(false);
@@ -132,6 +138,7 @@ export default function HackTeamUpClient({ initialFilters }: Props) {
     if (teamSizeFilter?.value)
       params.set("teamSize", teamSizeFilter.value.toString());
     if (locationFilter) params.set("location", locationFilter);
+    if (hackNameFilter) params.set("hackname", hackNameFilter);
     if (skills.length > 0) params.set("skills", skills.join(","));
 
     const newQueryString = params.toString();
@@ -149,6 +156,7 @@ export default function HackTeamUpClient({ initialFilters }: Props) {
     setHackModeFilter("");
     setSelectedTeamSizeFilter(null);
     setLocationFilter("");
+    setHackNameFilter("");
     setSkills([]);
 
     setAppliedQueryString("");
@@ -224,6 +232,13 @@ export default function HackTeamUpClient({ initialFilters }: Props) {
                 )}
 
                 <input
+                  placeholder="Hack name"
+                  value={hackNameFilter}
+                  onChange={(e) => setHackNameFilter(e.target.value)}
+                  className="bg-white/10 px-3 py-2 rounded-md outline-none border border-white/10 focus:border-teal-400/60"
+                />
+
+                <input
                   placeholder="Location (Mumbai, Pune...)"
                   value={locationFilter}
                   onChange={(e) => setLocationFilter(e.target.value)}
@@ -274,7 +289,7 @@ export default function HackTeamUpClient({ initialFilters }: Props) {
           </>
         )}
       </AnimatePresence>,
-      document.body
+      document.body,
     );
 
   if (error) return <p className="text-red-400">{(error as Error).message}</p>;

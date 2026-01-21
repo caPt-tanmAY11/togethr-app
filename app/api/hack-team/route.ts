@@ -241,6 +241,8 @@ export async function GET(req: NextRequest) {
         const teamSize = searchParams.get("teamSize");
         const location = searchParams.get("location");
 
+        const hackName = searchParams.get("hackname");
+
         const skills = searchParams
             .get("skills")
             ?.split(",")
@@ -267,6 +269,13 @@ export async function GET(req: NextRequest) {
             ...(location && {
                 hackLocation: {
                     contains: location,
+                    mode: "insensitive"
+                }
+            }),
+
+            ...(hackName && {
+                hackName: {
+                    contains: hackName,
                     mode: "insensitive"
                 }
             }),

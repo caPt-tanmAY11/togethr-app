@@ -162,6 +162,8 @@ export async function GET(req: NextRequest) {
             ?.split(",")
             .map(skill => skill.toLowerCase().trim());
 
+        const tags = searchParams.get("tags")?.split(",").map(tag => tag.toLowerCase().trim());
+
         const projectCommitment = Object.values(CommitmentLevel).includes(projectCommitmentModeParam as CommitmentLevel)
             ? (projectCommitmentModeParam as CommitmentLevel)
             : undefined;
@@ -181,6 +183,12 @@ export async function GET(req: NextRequest) {
             ...(skills && skills.length > 0 && {
                 skillStack: {
                     hasSome: skills
+                }
+
+            }),
+            ...(tags && tags.length > 0 && {
+                tags: {
+                    hasSome: tags
                 }
             }),
 
