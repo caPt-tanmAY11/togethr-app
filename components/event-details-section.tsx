@@ -58,19 +58,19 @@ export default function EventDetailsSection({ eventDetails, setEventDetails }: {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-white/80">
                             <div>
                                 <span className="font-medium">Start:</span>{" "}
-                                {new Date(eventDetails.startTime).toLocaleString() || "—"}
+                                {new Date(eventDetails.startTime).toLocaleString() || "-"}
                             </div>
                             <div>
                                 <span className="font-medium">End:</span>{" "}
-                                {new Date(eventDetails.endTime).toLocaleString() || "—"}
+                                {new Date(eventDetails.endTime).toLocaleString() || "-"}
                             </div>
                             <div>
                                 <span className="font-medium">Mode:</span>{" "}
-                                {eventDetails.mode || "—"}
+                                {eventDetails.mode || "-"}
                             </div>
                             <div>
                                 <span className="font-medium">Location:</span>{" "}
-                                {eventDetails.location || "—"}
+                                {eventDetails.location || "-"}
                             </div>
                             {eventDetails.link && (
                                 <div className="md:col-span-2">

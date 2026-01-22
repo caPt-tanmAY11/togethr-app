@@ -52,14 +52,14 @@ export async function POST(req: Request) {
 
         if (!origin?.city?.trim()) {
             return NextResponse.json(
-                { success: false, error: "City is required", fields: ["origin.city"] },
+                { success: false, error: "Team city is required", fields: ["origin.city"] },
                 { status: 400 }
             );
         }
 
         if (!origin?.country?.trim()) {
             return NextResponse.json(
-                { success: false, error: "Country is required", fields: ["origin.country"] },
+                { success: false, error: "Team country is required", fields: ["origin.country"] },
                 { status: 400 }
             );
         }

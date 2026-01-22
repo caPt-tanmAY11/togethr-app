@@ -10,12 +10,14 @@ import EventDetailsSection from "@/components/event-details-section";
 import TeamSizeDropdown from "@/components/team-size-dropdown";
 import { isValidEmail } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg"];
 
 export default function CreateHackTeam() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
 
   const queryClient = useQueryClient();
 
@@ -143,6 +145,12 @@ export default function CreateHackTeam() {
     e: React.FormEvent<HTMLFormElement>,
   ) {
     e.preventDefault();
+
+    if (!session?.user?.id) {
+      toast.error("You must be logged in to create a hack team");
+      return;
+    }
+
     const formData = new FormData(e.target as HTMLFormElement);
 
     const teamData = {
@@ -158,6 +166,51 @@ export default function CreateHackTeam() {
       teamLeadEmail: String(formData.get("email") || "").trim(),
       teamDesc: String(formData.get("team-desc") || "").trim() || undefined,
     };
+
+    if (!teamData.name.trim()) {
+      toast.error("Team name is required");
+      return;
+    }
+
+    if (!teamData.origin.city.trim()) {
+      toast.error("Team city is required");
+      return;
+    }
+
+    if (!teamData.origin.country.trim()) {
+      toast.error("Team country is required");
+      return;
+    }
+
+    if (!teamData.size) {
+      toast.error("Team size is required");
+      return;
+    }
+
+    if (!teamData.hackDetails.name.trim()) {
+      toast.error("Hack name is required");
+      return;
+    }
+
+    if (!teamData.hackDetails.startTime || !teamData.hackDetails.endTime) {
+      toast.error("Hack time details is required");
+      return;
+    }
+
+    if (!teamData.hackDetails.mode) {
+      toast.error("Hack mode is required");
+      return;
+    }
+
+    if (!teamData.hackDetails.location) {
+      toast.error("Hack location is required");
+      return;
+    }
+
+    if (teamData.skillStack.length === 0) {
+      toast.error("At least one skill is required");
+      return;
+    }
 
     if (!isValidEmail(teamData.teamLeadEmail)) {
       toast.error("Please enter a valid email address");
